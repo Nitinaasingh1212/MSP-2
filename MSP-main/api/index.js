@@ -38,9 +38,12 @@ app.get('/api/debug-paths', (req, res) => {
   const debugInfo = {
     __dirname,
     cwd: process.cwd(),
-    parentDirs: []
+    parentDirs: [],
+    localUploads: [],
+    publicUploads: []
   };
 
+  // 1. Scan Parent Directories
   let current = __dirname;
   for (let i = 0; i < 5; i++) {
     current = path.dirname(current);
@@ -62,6 +65,30 @@ app.get('/api/debug-paths', (req, res) => {
         error: e.message
       });
     }
+  }
+
+  // 2. Scan Local Uploads
+  const localDir = path.join(__dirname, '../assets/uploads/products');
+  try {
+    if (fs.existsSync(localDir)) {
+      debugInfo.localUploads = fs.readdirSync(localDir);
+    } else {
+      debugInfo.localUploads = ['Directory does not exist'];
+    }
+  } catch (e) {
+    debugInfo.localUploads = ['Error: ' + e.message];
+  }
+
+  // 3. Scan Public Uploads
+  const publicDir = path.join(__dirname, '../../public_html/assets/uploads/products');
+  try {
+    if (fs.existsSync(publicDir)) {
+      debugInfo.publicUploads = fs.readdirSync(publicDir);
+    } else {
+      debugInfo.publicUploads = ['Directory does not exist'];
+    }
+  } catch (e) {
+    debugInfo.publicUploads = ['Error: ' + e.message];
   }
 
   res.json(debugInfo);
