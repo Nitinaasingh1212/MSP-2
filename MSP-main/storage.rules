@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Checks if user is logged in
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Products folder rules (images)
+    match /products/{allPaths=**} {
+      allow read: if true; // anyone can view images
+      allow write: if isAuthenticated(); // only authenticated admins can write
+    }
+    
+    // PDF Brochures folder rules (documents)
+    match /pdfs/{allPaths=**} {
+      allow read: if true; // anyone can download brochures
+      allow write: if isAuthenticated(); // only authenticated admins can write
+    }
+  }
+}

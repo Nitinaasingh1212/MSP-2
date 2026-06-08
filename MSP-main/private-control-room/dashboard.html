@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Private Control Room</title>
+  
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  
+  <!-- Firebase SDK (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  
+  <!-- Chart.js CDN for Admin Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- Left Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-top">
+        <a href="dashboard.html" class="logo-wrapper" style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
+          <img src="../assets/logos/logo.png" alt="MSP Logo" class="logo-img" style="height:44px;">
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <div class="logo-text">MAA SUKRITI PHARMACEUTICALS</div>
+            <span style="font-size:0.6rem; color:var(--primary); font-weight:700; letter-spacing:1px; background:#fff; padding:2px 6px; border-radius:3px; text-transform:uppercase; width:fit-content; text-align:center;">Control Room</span>
+          </div>
+        </a>
+        <ul class="admin-sidebar-menu">
+          <li>
+            <a href="dashboard.html" class="admin-sidebar-link active">
+              <i data-lucide="layout-dashboard" style="width:18px; height:18px;"></i> Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="products.html" class="admin-sidebar-link">
+              <i data-lucide="pill" style="width:18px; height:18px;"></i> Products
+            </a>
+          </li>
+          <li>
+            <a href="categories.html" class="admin-sidebar-link">
+              <i data-lucide="tag" style="width:18px; height:18px;"></i> Categories
+            </a>
+          </li>
+          <li>
+            <a href="enquiries.html" class="admin-sidebar-link">
+              <i data-lucide="mail" style="width:18px; height:18px;"></i> Enquiries
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="admin-sidebar-bottom">
+        <button onclick="handleAdminLogout()" class="btn btn-outline btn-sm" style="border-color:var(--error); color:var(--error); width:100%; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <i data-lucide="log-out" style="width:14px; height:14px;"></i> Log Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-content-area">
+      
+      <!-- Title Row -->
+      <div class="admin-title-row">
+        <div>
+          <h2 style="font-size: 1.75rem;">Dashboard Overview</h2>
+          <p style="font-size: 0.9rem; color: var(--gray-dark);">Realtime analytics & enquiry database status.</p>
+        </div>
+        <div id="dbModeBadge" style="background-color: var(--primary-light); color: var(--primary-dark); padding: 0.35rem 1rem; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 700;">
+          Loading database connection...
+        </div>
+      </div>
+      
+      <!-- Stats Counters Grid -->
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+          <div class="admin-stat-info">
+            <h3>Total Formulations</h3>
+            <div class="admin-stat-value" id="statTotalProducts">0</div>
+          </div>
+          <div class="admin-stat-icon icon-blue"><i data-lucide="database"></i></div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-info">
+            <h3>Total Categories</h3>
+            <div class="admin-stat-value" id="statTotalCategories">0</div>
+          </div>
+          <div class="admin-stat-icon icon-teal"><i data-lucide="tag"></i></div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-info">
+            <h3>Total Enquiries</h3>
+            <div class="admin-stat-value" id="statTotalEnquiries">0</div>
+          </div>
+          <div class="admin-stat-icon icon-green"><i data-lucide="mail-open"></i></div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-info">
+            <h3>Total Packs Quantity</h3>
+            <div class="admin-stat-value" id="statTotalQty">0</div>
+          </div>
+          <div class="admin-stat-icon icon-amber"><i data-lucide="layers"></i></div>
+        </div>
+      </div>
+      
+      <!-- Charts Analytics Section -->
+      <div class="admin-charts-grid">
+        <!-- Monthly Enquiries Chart -->
+        <div class="admin-chart-card">
+          <div class="admin-chart-header">Monthly Enquiries Trend</div>
+          <div class="chart-container">
+            <canvas id="monthlyEnquiriesChart"></canvas>
+          </div>
+        </div>
+        
+        <!-- Category Breakdown Chart -->
+        <div class="admin-chart-card">
+          <div class="admin-chart-header">Division Share breakdown</div>
+          <div class="chart-container">
+            <canvas id="categoryBreakdownChart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Recent Enquiries List Card -->
+      <div class="admin-table-card">
+        <div class="admin-table-header">
+          <div class="admin-table-title">Recent Customer Enquiries</div>
+          <a href="enquiries.html" class="btn btn-outline btn-sm">Manage All Enquiries</a>
+        </div>
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Customer Details</th>
+                <th>Location</th>
+                <th>Packs Total</th>
+                <th>Submission Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="recentEnquiriesTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--gray-dark);">Loading database table...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+    </main>
+  </div>
+
+  <!-- Lucide Script -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/products.js"></script>
+  <script src="../js/admin.js"></script>
+  
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

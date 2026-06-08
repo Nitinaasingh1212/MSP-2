@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Products | Private Control Room</title>
+  
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  
+  <!-- Firebase SDK (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- Left Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-top">
+        <a href="dashboard.html" class="logo-wrapper" style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
+          <img src="../assets/logos/logo.png" alt="MSP Logo" class="logo-img" style="height:44px;">
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <div class="logo-text">MAA SUKRITI PHARMACEUTICALS</div>
+            <span style="font-size:0.6rem; color:var(--primary); font-weight:700; letter-spacing:1px; background:#fff; padding:2px 6px; border-radius:3px; text-transform:uppercase; width:fit-content; text-align:center;">Control Room</span>
+          </div>
+        </a>
+        <ul class="admin-sidebar-menu">
+          <li>
+            <a href="dashboard.html" class="admin-sidebar-link">
+              <i data-lucide="layout-dashboard" style="width:18px; height:18px;"></i> Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="products.html" class="admin-sidebar-link active">
+              <i data-lucide="pill" style="width:18px; height:18px;"></i> Products
+            </a>
+          </li>
+          <li>
+            <a href="categories.html" class="admin-sidebar-link">
+              <i data-lucide="tag" style="width:18px; height:18px;"></i> Categories
+            </a>
+          </li>
+          <li>
+            <a href="enquiries.html" class="admin-sidebar-link">
+              <i data-lucide="mail" style="width:18px; height:18px;"></i> Enquiries
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="admin-sidebar-bottom">
+        <button onclick="handleAdminLogout()" class="btn btn-outline btn-sm" style="border-color:var(--error); color:var(--error); width:100%; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <i data-lucide="log-out" style="width:14px; height:14px;"></i> Log Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-content-area">
+      
+      <!-- Title Row -->
+      <div class="admin-title-row">
+        <div>
+          <h2 style="font-size: 1.75rem;">Manage Formulations</h2>
+          <p style="font-size: 0.9rem; color: var(--gray-dark);">Add, edit, hide, or delete catalogue formulations.</p>
+        </div>
+        <button onclick="openProductModal('add')" class="btn btn-primary" style="display:flex; align-items:center; gap:6px;">
+          <i data-lucide="plus-circle"></i> Add New Product
+        </button>
+      </div>
+      
+      <!-- Filters bar for quick navigation in list -->
+      <div style="background-color: var(--white); padding: var(--spacing-sm); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); display: flex; gap: 1rem; align-items: center; margin-bottom: var(--spacing-md); flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px; position: relative;">
+          <input type="text" id="adminSearchInput" class="form-control" placeholder="Search formulations by name, composition..." style="padding-left: 2.5rem;">
+          <i data-lucide="search" style="position: absolute; left: 10px; top: 10px; color: var(--gray-medium); width: 18px; height: 18px;"></i>
+        </div>
+        <div style="width: 200px;">
+          <select id="adminCategorySelect" class="form-control">
+            <option value="all">All Divisions</option>
+            <!-- Dynaimcally loaded -->
+          </select>
+        </div>
+      </div>
+      
+      <!-- Products Table List -->
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>Division / Category</th>
+                <th>Composition</th>
+                <th>Featured</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminProductsTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--gray-dark);">Loading products table...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+    </main>
+  </div>
+
+  <!-- Add/Edit Product Modal -->
+  <div class="modal" id="productModal">
+    <div class="modal-content modal-lg">
+      <button class="modal-close" onclick="closeProductModal()">&times;</button>
+      <h3 style="font-size: 1.25rem; border-bottom: 1px solid var(--gray-light); padding-bottom: 0.5rem; margin-bottom: 1rem;" id="modalTitle">Add Formulation</h3>
+      
+      <form id="productForm" onsubmit="saveProduct(event)">
+        <input type="hidden" id="formProductId">
+        
+        <div class="form-group" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1rem;">
+          <div>
+            <label class="form-label" for="formName">Product Name *</label>
+            <input type="text" id="formName" class="form-control" placeholder="e.g. Paracetamol 650mg" required>
+          </div>
+          <div>
+            <label class="form-label" for="formCategory">Division / Category *</label>
+            <select id="formCategory" class="form-control" required>
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="formComposition">Composition Formula *</label>
+          <input type="text" id="formComposition" class="form-control" placeholder="e.g. Paracetamol IP 650mg" required>
+        </div>
+        
+        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label class="form-label" for="formPackaging">Packaging specs *</label>
+            <input type="text" id="formPackaging" class="form-control" placeholder="e.g. 10 x 10 Blister" required>
+          </div>
+          <div style="display: flex; gap: 1.5rem; align-items: center; margin-top: 1.8rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; cursor: pointer;">
+              <input type="checkbox" id="formFeatured" style="width: 18px; height: 18px; cursor: pointer;">
+              Featured Formulation
+            </label>
+            
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; cursor: pointer;">
+              <input type="checkbox" id="formStatus" style="width: 18px; height: 18px; cursor: pointer;" checked>
+              Active (Visible)
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="formDescription">Description *</label>
+          <textarea id="formDescription" class="form-control" placeholder="Provide description, indications, clinical dosing etc." required></textarea>
+        </div>
+        
+        <!-- Image & PDF Brochure Upload Grid -->
+        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label class="form-label">Product Image</label>
+            <div class="file-upload-wrapper">
+              <div class="file-upload-box" id="imageUploadBox">
+                <i data-lucide="image" style="width:24px; height:24px;"></i>
+                <p style="font-size:0.8rem; font-weight:600; color:var(--gray-dark);">Drag & Drop Image or Click</p>
+                <input type="file" id="formImageFile" class="file-upload-input" accept="image/*" onchange="previewFile(this, 'imgPreview')">
+              </div>
+              <div class="file-preview" id="imgPreview">No image selected</div>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Product Brochure (PDF)</label>
+            <div class="file-upload-wrapper">
+              <div class="file-upload-box" id="pdfUploadBox">
+                <i data-lucide="file-text" style="width:24px; height:24px;"></i>
+                <p style="font-size:0.8rem; font-weight:600; color:var(--gray-dark);">Drag & Drop PDF or Click</p>
+                <input type="file" id="formPdfFile" class="file-upload-input" accept="application/pdf" onchange="previewFile(this, 'pdfPreview')">
+              </div>
+              <div class="file-preview" id="pdfPreview">No PDF selected</div>
+            </div>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 1rem; border-top: 1px solid var(--gray-light); padding-top: 1rem;">
+          <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeProductModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex: 1;" id="saveProductBtn">Save Formulation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom Alert Toast -->
+  <div class="toast-notification" id="toastBox">
+    <i data-lucide="info" id="toastIcon"></i>
+    <span id="toastMsg">Notification message</span>
+  </div>
+
+  <!-- Lucide Script -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/products.js"></script>
+  <script src="../js/admin.js"></script>
+  
+  <script>
+    // Preview files helper in modal
+    function previewFile(input, previewId) {
+      const preview = document.getElementById(previewId);
+      if (input.files && input.files[0]) {
+        preview.innerText = input.files[0].name;
+        preview.style.display = "block";
+      } else {
+        preview.style.display = "none";
+      }
+    }
+    
+    lucide.createIcons();
+  </script>
+</body>
+</html>

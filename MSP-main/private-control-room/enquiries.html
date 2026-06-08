@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Enquiries | Private Control Room</title>
+  
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  
+  <!-- Firebase SDK (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- Left Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-top">
+        <a href="dashboard.html" class="logo-wrapper" style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
+          <img src="../assets/logos/logo.png" alt="MSP Logo" class="logo-img" style="height:44px;">
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <div class="logo-text">MAA SUKRITI PHARMACEUTICALS</div>
+            <span style="font-size:0.6rem; color:var(--primary); font-weight:700; letter-spacing:1px; background:#fff; padding:2px 6px; border-radius:3px; text-transform:uppercase; width:fit-content; text-align:center;">Control Room</span>
+          </div>
+        </a>
+        <ul class="admin-sidebar-menu">
+          <li>
+            <a href="dashboard.html" class="admin-sidebar-link">
+              <i data-lucide="layout-dashboard" style="width:18px; height:18px;"></i> Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="products.html" class="admin-sidebar-link">
+              <i data-lucide="pill" style="width:18px; height:18px;"></i> Products
+            </a>
+          </li>
+          <li>
+            <a href="categories.html" class="admin-sidebar-link">
+              <i data-lucide="tag" style="width:18px; height:18px;"></i> Categories
+            </a>
+          </li>
+          <li>
+            <a href="enquiries.html" class="admin-sidebar-link active">
+              <i data-lucide="mail" style="width:18px; height:18px;"></i> Enquiries
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="admin-sidebar-bottom">
+        <button onclick="handleAdminLogout()" class="btn btn-outline btn-sm" style="border-color:var(--error); color:var(--error); width:100%; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <i data-lucide="log-out" style="width:14px; height:14px;"></i> Log Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-content-area">
+      
+      <!-- Title Row -->
+      <div class="admin-title-row">
+        <div>
+          <h2 style="font-size: 1.75rem;">Manage Customer Enquiries</h2>
+          <p style="font-size: 0.9rem; color: var(--gray-dark);">Inspect purchase queries, update status, and manage histories.</p>
+        </div>
+      </div>
+      
+      <!-- Enquiry Filters Bar -->
+      <div style="background-color: var(--white); padding: var(--spacing-sm); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); display: flex; gap: 1rem; align-items: center; margin-bottom: var(--spacing-md); flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px; position: relative;">
+          <input type="text" id="enquirySearchInput" class="form-control" placeholder="Search by customer name, mobile..." style="padding-left: 2.5rem;">
+          <i data-lucide="search" style="position: absolute; left: 10px; top: 10px; color: var(--gray-medium); width: 18px; height: 18px;"></i>
+        </div>
+        <div style="width: 200px;">
+          <select id="enquiryStatusSelect" class="form-control">
+            <option value="all">All Enquiries</option>
+            <option value="New">New</option>
+            <option value="Contacted">Contacted</option>
+            <option value="Closed">Closed</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Enquiries Table -->
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Customer Name</th>
+                <th>Contact Info</th>
+                <th>Location</th>
+                <th>Total Qty</th>
+                <th>Date Submitted</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminEnquiriesTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--gray-dark);">Loading enquiries table...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+    </main>
+  </div>
+
+  <!-- View Enquiry Detail Modal -->
+  <div class="modal" id="enquiryDetailModal">
+    <div class="modal-content modal-lg">
+      <button class="modal-close" onclick="closeEnquiryDetailModal()">&times;</button>
+      <h3 style="font-size: 1.25rem; border-bottom: 1px solid var(--gray-light); padding-bottom: 0.5rem; margin-bottom: 1rem;">Customer Enquiry Details</h3>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; background-color: var(--light); padding: var(--spacing-sm); border-radius: var(--radius-md); border: 1px solid var(--gray-light);">
+        <div>
+          <p style="font-size: 0.8rem; color: var(--gray-dark); font-weight: 700; text-transform: uppercase;">Customer Details</p>
+          <h4 id="detCustName" style="font-size: 1.1rem; color: var(--dark); margin-top: 2px;">Name</h4>
+          <p style="font-size: 0.9rem;" id="detCustCompany">Company Name</p>
+          <p style="font-size: 0.9rem; font-weight: 600; color: var(--primary-dark);" id="detCustMobile">WhatsApp: +919415021041</p>
+        </div>
+        <div>
+          <p style="font-size: 0.8rem; color: var(--gray-dark); font-weight: 700; text-transform: uppercase;">Location & Date</p>
+          <p style="font-size: 0.9rem; margin-top: 2px;" id="detCustLocation">City, State</p>
+          <p style="font-size: 0.9rem; color: var(--gray-dark);" id="detEnquiryDate">Submitted Date</p>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 6px;">
+            <span style="font-weight: 700; font-size: 0.85rem;">Status:</span>
+            <select id="detEnquiryStatus" class="form-control" style="width: 130px; padding: 0.25rem 0.5rem; height: 32px; font-size: 0.85rem;" onchange="updateModalEnquiryStatus(this.value)">
+              <option value="New">New</option>
+              <option value="Contacted">Contacted</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--dark); display: flex; align-items: center; gap: 4px;">
+        <i data-lucide="shopping-cart" style="width: 18px; height: 18px;"></i> Requested Formulations
+      </h4>
+      
+      <!-- List of Ordered items -->
+      <div style="max-height: 200px; overflow-y: auto; border: 1px solid var(--gray-light); border-radius: var(--radius-sm); margin-bottom: 1rem;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+          <thead>
+            <tr style="background-color: var(--light); border-bottom: 1px solid var(--gray-medium);">
+              <th style="padding: 0.5rem var(--spacing-sm);">Division</th>
+              <th style="padding: 0.5rem var(--spacing-sm);">Product Name</th>
+              <th style="padding: 0.5rem var(--spacing-sm); text-align: right;">Quantity</th>
+            </tr>
+          </thead>
+          <tbody id="detProductsTableBody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+      
+      <div style="display: flex; gap: 1rem; border-top: 1px solid var(--gray-light); padding-top: 1rem;">
+        <a id="detDirectWhatsappCall" href="" class="btn btn-whatsapp btn-sm" target="_blank" style="flex: 1.5;">
+          <i data-lucide="message-circle"></i> Direct WhatsApp Call / Chat
+        </a>
+        <button type="button" class="btn btn-outline btn-sm" style="flex: 1;" onclick="closeEnquiryDetailModal()">Close Details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Alert Toast -->
+  <div class="toast-notification" id="toastBox">
+    <i data-lucide="info" id="toastIcon"></i>
+    <span id="toastMsg">Notification message</span>
+  </div>
+
+  <!-- Lucide Script -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/products.js"></script>
+  <script src="../js/admin.js"></script>
+  
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

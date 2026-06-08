@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us | Maa Sukriti Pharmaceuticals</title>
+  
+  <meta name="description" content="Learn about Maa Sukriti Pharmaceuticals, our mission, vision, WHO-GMP certified infrastructure, and commitment to high-quality healthcare formulations.">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header class="header scrolled" id="mainHeader">
+    <div class="container nav-container">
+      <a href="index.html" class="logo-wrapper">
+        <img src="assets/logos/logo.png" alt="MSP Logo" class="logo-img">
+        <div class="logo-text">
+          MAA SUKRITI PHARMACEUTICALS
+          <span class="logo-tagline">Embrace Your Health</span>
+        </div>
+      </a>
+      
+      <nav>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="about.html" class="nav-link active">About Us</a></li>
+          <li><a href="products.html" class="nav-link">Products</a></li>
+          <li><a href="contact.html" class="nav-link">Contact Us</a></li>
+        </ul>
+      </nav>
+      
+      <div class="nav-actions">
+        <a href="cart.html" class="cart-icon-btn" id="cartBtn" title="View Enquiry Cart">
+          <i data-lucide="shopping-cart"></i>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Banner -->
+  <section class="page-banner">
+    <div class="container">
+      <h1>About Our Company</h1>
+      <ul class="breadcrumb">
+        <li><a href="index.html">Home</a></li>
+        <li class="breadcrumb-separator">/</li>
+        <li>About Us</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Company Story -->
+  <section class="section">
+    <div class="container hero-grid">
+      <div>
+        <span class="badge-title">Our Roots</span>
+        <h2 class="section-title" style="text-align: left; margin-bottom: var(--spacing-sm);">A Legacy of Pharmaceutical Excellence</h2>
+        <p class="section-subtitle" style="text-align: left; margin-bottom: var(--spacing-md); line-height: 1.7;">
+          Founded with a goal to make high-quality medical formulations accessible, Maa Sukriti Pharmaceuticals has grown into a leading name in the clinical supply industry. We support health systems with safe, affordable, and quality-controlled medicines.
+        </p>
+        <p style="color: var(--gray-dark); margin-bottom: var(--spacing-md);">
+          We handle complete pharmaceutical processing from raw chemical sourcing to formulation, packaging, and regulatory documentation. By constantly investing in manufacturing technology and research, we maintain strict safety levels for all drug products.
+        </p>
+        <div style="display: flex; gap: 2rem; margin-top: var(--spacing-md);">
+          <div>
+            <h4 style="font-size: 1.5rem; color: var(--primary);">WHO-GMP</h4>
+            <p style="font-size: 0.85rem; color: var(--gray-dark);">Standard Certification</p>
+          </div>
+          <div style="border-left: 2px solid var(--gray-medium); padding-left: 2rem;">
+            <h4 style="font-size: 1.5rem; color: var(--secondary);">100% Safe</h4>
+            <p style="font-size: 0.85rem; color: var(--gray-dark);">Clinical Approval Rate</p>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg" style="background:#fff; border-radius:20px; box-shadow:var(--shadow-md);">
+          <rect width="100%" height="100%" fill="#ccfbf1" opacity="0.3"/>
+          <circle cx="250" cy="200" r="120" fill="none" stroke="#0d9488" stroke-width="8" stroke-dasharray="15 8"/>
+          <!-- Factory/Building Graphic -->
+          <g transform="translate(150, 130)" fill="#0f766e">
+            <rect x="20" y="80" width="160" height="70" rx="4"/>
+            <polygon points="20,80 50,50 80,80 110,50 140,80 180,80"/>
+            <rect x="50" y="100" width="20" height="20" fill="#fff"/>
+            <rect x="90" y="100" width="20" height="20" fill="#fff"/>
+            <rect x="130" y="100" width="20" height="20" fill="#fff"/>
+            <!-- Chimney -->
+            <rect x="150" y="30" width="20" height="50" fill="#475569"/>
+            <path d="M150,30 L170,30 L165,20 L155,20 Z" fill="#334155"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vision, Mission & Values -->
+  <section class="section section-bg">
+    <div class="container">
+      <div class="why-us-grid">
+        <div class="why-card">
+          <div class="why-card-icon"><i data-lucide="eye"></i></div>
+          <h3 class="why-card-title">Our Vision</h3>
+          <p class="why-card-desc">To become a benchmark player in clinical formulations globally by expanding our therapeutic ranges and offering reliable franchise models.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-card-icon"><i data-lucide="compass"></i></div>
+          <h3 class="why-card-title">Our Mission</h3>
+          <p class="why-card-desc">Providing high-grade therapeutics through GMP-compliant production and supporting local distributors with steady, affordable medicine supply chain solutions.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-card-icon"><i data-lucide="award"></i></div>
+          <h3 class="why-card-title">Core Values</h3>
+          <p class="why-card-desc">Quality adherence, operational honesty, logistics responsiveness, and prioritizing community healthcare over business margins.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Infrastructure Details -->
+  <section class="section">
+    <div class="container hero-grid">
+      <div>
+        <svg viewBox="0 0 450 350" xmlns="http://www.w3.org/2000/svg" style="background:#fff; border-radius:20px; box-shadow:var(--shadow-md);">
+          <rect width="100%" height="100%" fill="#e0f2fe" opacity="0.3"/>
+          <g transform="translate(75, 50)" fill="#0ea5e9">
+            <rect x="0" y="200" width="300" height="30" rx="5"/>
+            <!-- Microscope illustration -->
+            <path d="M120,50 L120,180" stroke="#0f172a" stroke-width="12" stroke-linecap="round"/>
+            <path d="M80,180 L220,180" stroke="#0f172a" stroke-width="12" stroke-linecap="round"/>
+            <path d="M120,80 A60,60 0 0,0 180,140" fill="none" stroke="#0ea5e9" stroke-width="12"/>
+            <rect x="160" y="40" width="24" height="80" transform="rotate(30 160 40)" rx="5"/>
+            <circle cx="150" cy="150" r="10" fill="#10b981"/>
+          </g>
+        </svg>
+      </div>
+      
+      <div>
+        <span class="badge-title">Infrastructure</span>
+        <h2 class="section-title" style="text-align: left; margin-bottom: var(--spacing-sm);">Modern Processing Units</h2>
+        <p class="section-subtitle" style="text-align: left; margin-bottom: var(--spacing-md);">
+          Our advanced production complex features cleanroom divisions built to WHO specs, featuring low-tolerance air filtration systems (HEPA).
+        </p>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 1rem; color: var(--gray-dark); font-weight: 500;">
+          <li style="display: flex; gap: 0.75rem; align-items: center;">
+            <i data-lucide="check-square" style="color: var(--primary);"></i>
+            <span>Separate Formulation areas for beta-lactams and non-beta-lactams.</span>
+          </li>
+          <li style="display: flex; gap: 0.75rem; align-items: center;">
+            <i data-lucide="check-square" style="color: var(--primary);"></i>
+            <span>Fully automated tablet compression and blister packaging units.</span>
+          </li>
+          <li style="display: flex; gap: 0.75rem; align-items: center;">
+            <i data-lucide="check-square" style="color: var(--primary);"></i>
+            <span>Strict HVAC humidity controls to prevent drug moisture degradation.</span>
+          </li>
+          <li style="display: flex; gap: 0.75rem; align-items: center;">
+            <i data-lucide="check-square" style="color: var(--primary);"></i>
+            <span>Modern testing lab containing HPLC, FTIR, and dissolution rate testing tools.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="section section-bg">
+    <div class="container">
+      <div class="section-title-wrapper">
+        <span class="badge-title">Our Leaders</span>
+        <h2 class="section-title">Governing Leadership & Experts</h2>
+        <p class="section-subtitle">Meet the directors and clinical specialists leading the company's strategy.</p>
+      </div>
+      
+      <div class="why-us-grid">
+        <div class="why-card">
+          <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2rem; margin: 0 auto 1.5rem auto;">MB</div>
+          <h3 class="why-card-title">M.S. Bharat</h3>
+          <p style="color: var(--primary); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;">Managing Director</p>
+          <p class="why-card-desc">With over 20 years in drug supply systems, directing overall enterprise direction and distribution partnerships.</p>
+        </div>
+        <div class="why-card">
+          <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2rem; margin: 0 auto 1.5rem auto;">KS</div>
+          <h3 class="why-card-title">Dr. Kiran Sharma</h3>
+          <p style="color: var(--primary); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;">Director of R&D</p>
+          <p class="why-card-desc">Ph.D. in Pharmaceutics, overseeing chemical compound synthesis, testing compliance, and formulation stability.</p>
+        </div>
+        <div class="why-card">
+          <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2rem; margin: 0 auto 1.5rem auto;">AG</div>
+          <h3 class="why-card-title">Anil Gupta</h3>
+          <p style="color: var(--primary); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;">Head of Quality Assurance</p>
+          <p class="why-card-desc">Ensures WHO validation rules are adhered to at every stage, from material import to batch shipment checks.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer-main">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <h3>Maa Sukriti Pharmaceuticals</h3>
+        <p>A trusted name in pharmaceutical formulations, bringing wellness through clinically safe, innovative, and affordable drugs.</p>
+        <div class="certs">
+          <span style="font-size: 0.75rem; border:1px solid var(--primary); padding: 2px 6px; border-radius:3px; color: var(--primary);">WHO-GMP</span>
+          <span style="font-size: 0.75rem; border:1px solid var(--secondary); padding: 2px 6px; border-radius:3px; color: var(--secondary);">ISO 9001</span>
+        </div>
+      </div>
+      
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li class="footer-link"><a href="index.html">Home</a></li>
+          <li class="footer-link"><a href="about.html">About Us</a></li>
+          <li class="footer-link"><a href="products.html">Product Catalog</a></li>
+          <li class="footer-link"><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-col">
+        <h4>Divisions</h4>
+        <ul class="footer-links">
+          <li class="footer-link"><a href="products.html?cat=Tablets">Tablets</a></li>
+          <li class="footer-link"><a href="products.html?cat=Capsules">Capsules</a></li>
+          <li class="footer-link"><a href="products.html?cat=Syrups">Syrups</a></li>
+          <li class="footer-link"><a href="products.html?cat=Injections">Injections</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-col">
+        <h4>Corporate Office</h4>
+        <ul class="footer-contact-list">
+          <li class="footer-contact-item">
+            <i data-lucide="map-pin" size="18"></i>
+            <span>OAL/SA/FF/112A, 1st Floor, Omaxe Avenue, Lucknow, Uttar Pradesh, INDIA -226025</span>
+          </li>
+          <li class="footer-contact-item">
+            <i data-lucide="phone" size="18"></i>
+            <span>+919415021041</span>
+          </li>
+          <li class="footer-contact-item">
+            <i data-lucide="mail" size="18"></i>
+            <span>info@mspbharat.com / mspbharat23@gmail.com</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="container footer-bottom">
+      <p>&copy; 2026 Maa Sukriti Pharmaceuticals NextGen. All Rights Reserved. Designed for premium clinic quality.</p>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp Enquiry Trigger -->
+  <a href="https://wa.me/919415021041?text=Hello%20MSP%20Bharat,%20I%20have%20an%20enquiry%20regarding%20your%20products." class="whatsapp-float" target="_blank" title="Enquiry WhatsApp Helpdesk">
+    <i data-lucide="message-circle" style="width: 32px; height: 32px;"></i>
+  </a>
+
+  <!-- Custom Alert Toast -->
+  <div class="toast-notification" id="toastBox">
+    <i data-lucide="info" id="toastIcon"></i>
+    <span id="toastMsg">Notification message</span>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script src="js/firebase-config.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    // Mobile Navbar toggler
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    menuToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+
+    // Initialize Lucide Icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>

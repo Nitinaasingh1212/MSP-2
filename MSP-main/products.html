@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Catalog | Maa Sukriti Pharmaceuticals</title>
+  
+  <meta name="description" content="Search and browse through Maa Sukriti Pharmaceuticals' complete catalog of pharmaceutical formulations. Filter by category, composition, or name.">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  
+  <!-- Firebase SDK (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header class="header scrolled" id="mainHeader">
+    <div class="container nav-container">
+      <a href="index.html" class="logo-wrapper">
+        <img src="assets/logos/logo.png" alt="MSP Logo" class="logo-img">
+        <div class="logo-text">
+          MAA SUKRITI PHARMACEUTICALS
+          <span class="logo-tagline">Embrace Your Health</span>
+        </div>
+      </a>
+      
+      <nav>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="about.html" class="nav-link">About Us</a></li>
+          <li><a href="products.html" class="nav-link active">Products</a></li>
+          <li><a href="contact.html" class="nav-link">Contact Us</a></li>
+        </ul>
+      </nav>
+      
+      <div class="nav-actions">
+        <a href="cart.html" class="cart-icon-btn" id="cartBtn" title="View Enquiry Cart">
+          <i data-lucide="shopping-cart"></i>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Banner -->
+  <section class="page-banner">
+    <div class="container">
+      <h1>Our Pharmaceutical Products</h1>
+      <ul class="breadcrumb">
+        <li><a href="index.html">Home</a></li>
+        <li class="breadcrumb-separator">/</li>
+        <li>Products</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Catalog Section -->
+  <section class="section">
+    <div class="container" style="display: grid; grid-template-columns: 280px 1fr; gap: var(--spacing-lg); align-items: start;" id="catalogGrid">
+      
+      <!-- Filter Sidebar (Responsive) -->
+      <aside class="sidebar-filters" id="sidebarFilters" style="background-color: var(--white); padding: var(--spacing-md); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--gray-light); position: sticky; top: 100px;">
+        
+        <!-- Search Group -->
+        <div style="margin-bottom: var(--spacing-md);">
+          <label class="form-label" for="searchInput">Search Product</label>
+          <div style="position: relative;">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by name, formula..." style="padding-left: 2.5rem;">
+            <i data-lucide="search" style="position: absolute; left: 10px; top: 10px; color: var(--gray-medium); width: 18px; height: 18px;"></i>
+          </div>
+        </div>
+        
+        <!-- Categories List -->
+        <div style="margin-bottom: var(--spacing-md);">
+          <label class="form-label">Filter By Category</label>
+          <ul id="categoriesFilterList" style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto; padding-right: 5px;">
+            <li>
+              <button class="btn-category-filter active" data-category="all" style="width: 100%; text-align: left; background: none; border: none; padding: 0.5rem; font-weight: 600; cursor: pointer; border-radius: var(--radius-sm); font-size: 0.9rem; transition: var(--transition);">
+                All Categories
+              </button>
+            </li>
+            <!-- Dynamic Category List -->
+          </ul>
+        </div>
+        
+        <!-- Sorting -->
+        <div style="margin-bottom: var(--spacing-md);">
+          <label class="form-label" for="sortSelect">Sort By</label>
+          <select id="sortSelect" class="form-control">
+            <option value="name-asc">Alphabetical (A - Z)</option>
+            <option value="name-desc">Alphabetical (Z - A)</option>
+            <option value="newest">Newest Formulation</option>
+          </select>
+        </div>
+        
+        <button class="btn btn-outline btn-sm" id="resetFiltersBtn" style="width: 100%;">Reset Filters</button>
+      </aside>
+      
+      <!-- Catalog Display Grid -->
+      <main class="catalog-main">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+          <div style="font-size: 0.9rem; font-weight: 600; color: var(--gray-dark);">
+            Showing <span id="displayedCount">0</span> of <span id="totalCount">0</span> Products
+          </div>
+        </div>
+        
+        <!-- Products Grid Container -->
+        <div class="products-grid" id="catalogProductsContainer">
+          <!-- Dynamically populated -->
+          <div class="loading-placeholder" style="grid-column: 1/-1; text-align: center; padding: 4rem;">
+            <p>Loading products catalog...</p>
+          </div>
+        </div>
+        
+        <!-- Pagination controls -->
+        <div id="paginationContainer" style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: var(--spacing-lg);">
+          <button class="btn btn-outline btn-sm" id="prevPageBtn" disabled>
+            <i data-lucide="chevron-left"></i> Previous
+          </button>
+          <span id="pageNumbers" style="font-weight: 600; font-size: 0.95rem; color: var(--gray-dark);">Page 1 of 1</span>
+          <button class="btn btn-outline btn-sm" id="nextPageBtn" disabled>
+            Next <i data-lucide="chevron-right"></i>
+          </button>
+        </div>
+      </main>
+      
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer-main">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <h3>Maa Sukriti Pharmaceuticals</h3>
+        <p>A trusted name in pharmaceutical formulations, bringing wellness through clinically safe, innovative, and affordable drugs.</p>
+        <div class="certs">
+          <span style="font-size: 0.75rem; border:1px solid var(--primary); padding: 2px 6px; border-radius:3px; color: var(--primary);">WHO-GMP</span>
+          <span style="font-size: 0.75rem; border:1px solid var(--secondary); padding: 2px 6px; border-radius:3px; color: var(--secondary);">ISO 9001</span>
+        </div>
+      </div>
+      
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li class="footer-link"><a href="index.html">Home</a></li>
+          <li class="footer-link"><a href="about.html">About Us</a></li>
+          <li class="footer-link"><a href="products.html">Product Catalog</a></li>
+          <li class="footer-link"><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-col">
+        <h4>Divisions</h4>
+        <ul class="footer-links">
+          <li class="footer-link"><a href="products.html?cat=Tablets">Tablets</a></li>
+          <li class="footer-link"><a href="products.html?cat=Capsules">Capsules</a></li>
+          <li class="footer-link"><a href="products.html?cat=Syrups">Syrups</a></li>
+          <li class="footer-link"><a href="products.html?cat=Injections">Injections</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-col">
+        <h4>Corporate Office</h4>
+        <ul class="footer-contact-list">
+          <li class="footer-contact-item">
+            <i data-lucide="map-pin" size="18"></i>
+            <span>OAL/SA/FF/112A, 1st Floor, Omaxe Avenue, Lucknow, Uttar Pradesh, INDIA -226025</span>
+          </li>
+          <li class="footer-contact-item">
+            <i data-lucide="phone" size="18"></i>
+            <span>+919415021041</span>
+          </li>
+          <li class="footer-contact-item">
+            <i data-lucide="mail" size="18"></i>
+            <span>info@mspbharat.com / mspbharat23@gmail.com</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="container footer-bottom">
+      <p>&copy; 2026 Maa Sukriti Pharmaceuticals NextGen. All Rights Reserved. Designed for premium clinic quality.</p>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp Enquiry Trigger -->
+  <a href="https://wa.me/919415021041?text=Hello%20MSP%20Bharat,%20I%20have%20an%20enquiry%20regarding%20your%20products." class="whatsapp-float" target="_blank" title="Enquiry WhatsApp Helpdesk">
+     <i data-lucide="message-circle" style="width: 32px; height: 32px;"></i>
+  </a>
+
+  <!-- Custom Alert Toast -->
+  <div class="toast-notification" id="toastBox">
+    <i data-lucide="info" id="toastIcon"></i>
+    <span id="toastMsg">Notification message</span>
+  </div>
+
+  <style>
+    /* Styling overrides for active categories filter */
+    .btn-category-filter {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 0.6rem 0.8rem !important;
+      color: var(--gray-dark);
+    }
+    .btn-category-filter:hover {
+      color: var(--primary);
+      background-color: var(--light) !important;
+    }
+    .btn-category-filter.active {
+      color: var(--white);
+      background-color: var(--primary) !important;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    /* Layout style tweaks for filter responsive layout */
+    @media (max-width: 992px) {
+      #catalogGrid {
+        grid-template-columns: 1fr !important;
+      }
+      #sidebarFilters {
+        position: static !important;
+        margin-bottom: var(--spacing-sm);
+      }
+    }
+  </style>
+
+  <!-- Lucide Script -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Custom JS Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/filters.js"></script>
+  
+  <script>
+    // Mobile Navbar toggler
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    menuToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+
+    // Initialize Lucide Icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>

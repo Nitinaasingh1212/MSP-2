@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us | Maa Sukriti Pharmaceuticals</title>
+  
+  <meta name="description" content="Get in touch with Maa Sukriti Pharmaceuticals. Contact our Lucknow corporate office for franchise distributorship and third-party manufacturing queries.">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  
+  <!-- Firebase SDK (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header class="header scrolled" id="mainHeader">
+    <div class="container nav-container">
+      <a href="index.html" class="logo-wrapper">
+        <img src="assets/logos/logo.png" alt="MSP Logo" class="logo-img">
+        <div class="logo-text">
+          MAA SUKRITI PHARMACEUTICALS
+          <span class="logo-tagline">Embrace Your Health</span>
+        </div>
+      </a>
+      
+      <nav>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="about.html" class="nav-link">About Us</a></li>
+          <li><a href="products.html" class="nav-link">Products</a></li>
+          <li><a href="contact.html" class="nav-link active">Contact Us</a></li>
+        </ul>
+      </nav>
+      
+      <div class="nav-actions">
+        <a href="cart.html" class="cart-icon-btn" id="cartBtn" title="View Enquiry Cart">
+          <i data-lucide="shopping-cart"></i>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Banner -->
+  <section class="page-banner">
+    <div class="container">
+      <h1>Contact Us</h1>
+      <ul class="breadcrumb">
+        <li><a href="index.html">Home</a></li>
+        <li class="breadcrumb-separator">/</li>
+        <li>Contact Us</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Contact Form & Info Grid -->
+  <section class="section">
+    <div class="container" style="display: grid; grid-template-columns: 1fr 1.2fr; gap: var(--spacing-lg); align-items: start;" id="contactPageGrid">
+      
+      <!-- Left Column: Contact details -->
+      <div class="contact-info-col" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+        <div>
+          <span class="badge-title">Reach Us</span>
+          <h2 class="section-title" style="text-align: left; margin-bottom: var(--spacing-sm);">Get in Touch</h2>
+          <p class="section-subtitle" style="text-align: left; margin-bottom: var(--spacing-md);">
+            Have questions about franchise options, third-party processing, or stock? Contact our desk.
+          </p>
+        </div>
+        
+        <div style="background-color: var(--white); border-radius: var(--radius-md); padding: var(--spacing-md); border: 1px solid var(--gray-light); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 1.5rem;">
+          <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <div style="width: 44px; height: 44px; background-color: var(--primary-light); color: var(--primary); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="map-pin"></i>
+            </div>
+            <div>
+              <h4 style="font-size: 1rem; color: var(--dark);">Office Address</h4>
+              <p style="font-size: 0.9rem; color: var(--gray-dark);">OAL/SA/FF/112A, 1st Floor, Omaxe Avenue, Lucknow, Uttar Pradesh, INDIA -226025</p>
+            </div>
+          </div>
+          
+          <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <div style="width: 44px; height: 44px; background-color: var(--secondary-light); color: var(--secondary); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="phone"></i>
+            </div>
+            <div>
+              <h4 style="font-size: 1rem; color: var(--dark);">Call Support</h4>
+              <p style="font-size: 0.9rem; color: var(--gray-dark);">+919415021041</p>
+            </div>
+          </div>
+          
+          <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <div style="width: 44px; height: 44px; background-color: var(--success-light); color: var(--success); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="mail"></i>
+            </div>
+            <div>
+              <h4 style="font-size: 1rem; color: var(--dark);">Email Desk</h4>
+              <p style="font-size: 0.9rem; color: var(--gray-dark);">info@mspbharat.com / mspbharat23@gmail.com</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Column: Interactive Form -->
+      <div class="contact-form-col" style="background-color: var(--white); padding: var(--spacing-lg); border-radius: var(--radius-lg); border: 1px solid var(--gray-light); box-shadow: var(--shadow-sm);">
+        <h3 style="font-size: 1.25rem; margin-bottom: var(--spacing-md); border-bottom: 1px solid var(--gray-light); padding-bottom: var(--spacing-xs);">Send a Message</h3>
+        
+        <form id="contactForm" onsubmit="submitContactMessage(event)" style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="contactName">Full Name *</label>
+            <input type="text" id="contactName" class="form-control" placeholder="Enter your full name" required>
+          </div>
+          
+          <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label class="form-label" for="contactEmail">Email Address</label>
+              <input type="email" id="contactEmail" class="form-control" placeholder="Your email address">
+            </div>
+            <div>
+              <label class="form-label" for="contactPhone">Mobile Number *</label>
+              <input type="tel" id="contactPhone" class="form-control" placeholder="10-digit number" required pattern="[0-9]{10}">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="contactMsg">Message / Inquiry Details *</label>
+            <textarea id="contactMsg" class="form-control" placeholder="Provide product formulation interests or bulk deal requirements..." required></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary" style="width: 100%;">
+            Send Inquiry Message
+          </button>
+        </form>
+      </div>
+      
+    </div>
+  </section>
+
+  <!-- Interactive Google Map Placeholder -->
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div style="background-color: var(--white); border-radius: var(--radius-lg); padding: var(--spacing-xs); border: 1px solid var(--gray-light); box-shadow: var(--shadow-sm); overflow: hidden; height: 350px; margin-bottom: 1rem;">
+        <!-- Google Maps embed for Lucknow Omaxe Avenue -->
+        <iframe 
+          src="https://www.google.com/maps?q=OAL/SA/FF/112A,+1st+Floor,+Omaxe+Avenue,+Lucknow,+Uttar+Pradesh,+INDIA+-226025&output=embed" 
+          width="100%" 
+          height="100%" 
+          style="border:0; border-radius: 12px;" 
+          allowfullscreen="" 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+      <div style="text-align: center;">
+        <a href="https://maps.google.com/?q=OAL/SA/FF/112A,+1st+Floor,+Omaxe+Avenue,+Lucknow,+Uttar+Pradesh,+INDIA+-226025" class="btn btn-outline btn-sm" target="_blank" style="display:inline-flex; align-items:center; gap:6px;">
+          <i data-lucide="navigation" style="width:16px; height:16px;"></i> Get Directions on Google Maps
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer-main">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <h3>Maa Sukriti Pharmaceuticals</h3>
+        <p>A trusted name in pharmaceutical formulations, bringing wellness through clinically safe, innovative, and affordable drugs.</p>
+        <div class="certs">
+          <span style="font-size: 0.75rem; border:1px solid var(--primary); padding: 2px 6px; border-radius:3px; color: var(--primary);">WHO-GMP</span>
+          <span style="font-size: 0.75rem; border:1px solid var(--secondary); padding: 2px 6px; border-radius:3px; color: var(--secondary);">ISO 9001</span>
+        </div>
+      </div>
+      
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li class="footer-link"><a href="index.html">Home</a></li>
+          <li class="footer-link"><a href="about.html">About Us</a></li>
+          <li class="footer-link"><a href="products.html">Product Catalog</a></li>
+          <li class="footer-link"><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-col">
+        <h4>Divisions</h4>
+        <ul class="footer-links">
+          <li class="footer-link"><a href="products.html?cat=Tablets">Tablets</a></li>
+          <li class="footer-link"><a href="products.html?cat=Capsules">Capsules</a></li>
+          <li class="footer-link"><a href="products.html?cat=Syrups">Syrups</a></li>
+          <li class="footer-link"><a href="products.html?cat=Injections">Injections</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-col">
+        <h4>Corporate Office</h4>
+        <ul class="footer-contact-list">
+          <li class="footer-contact-item">
+            <i data-lucide="map-pin" size="18"></i>
+            <span>OAL/SA/FF/112A, 1st Floor, Omaxe Avenue, Lucknow, Uttar Pradesh, INDIA -226025</span>
+          </li>
+          <li class="footer-contact-item">
+            <i data-lucide="phone" size="18"></i>
+            <span>+919415021041</span>
+          </li>
+          <li class="footer-contact-item">
+            <i data-lucide="mail" size="18"></i>
+            <span>info@mspbharat.com / mspbharat23@gmail.com</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="container footer-bottom">
+      <p>&copy; 2026 Maa Sukriti Pharmaceuticals NextGen. All Rights Reserved. Designed for premium clinic quality.</p>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp Enquiry Trigger -->
+  <a href="https://wa.me/919415021041?text=Hello%20MSP%20Bharat,%20I%20have%20an%20enquiry%20regarding%20your%20products." class="whatsapp-float" target="_blank" title="Enquiry WhatsApp Helpdesk">
+    <i data-lucide="message-circle" style="width: 32px; height: 32px;"></i>
+  </a>
+
+  <!-- Custom Alert Toast -->
+  <div class="toast-notification" id="toastBox">
+    <i data-lucide="info" id="toastIcon"></i>
+    <span id="toastMsg">Notification message</span>
+  </div>
+
+  <style>
+    @media (max-width: 992px) {
+      #contactPageGrid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
+
+  <!-- Lucide Script -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Custom JS Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/cart.js"></script>
+  
+  <script>
+    // Mobile Navbar toggler
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    menuToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+
+    // Contact submission handler
+    async function submitContactMessage(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('contactName').value.trim();
+      const email = document.getElementById('contactEmail').value.trim();
+      const phone = document.getElementById('contactPhone').value.trim();
+      const msg = document.getElementById('contactMsg').value.trim();
+      
+      const statusInfo = getFirebaseStatus();
+      
+      // Toast notification helper function
+      const showToastMsg = (msgText, iconName, typeClass) => {
+        const toast = document.getElementById('toastBox');
+        const icon = document.getElementById('toastIcon');
+        const text = document.getElementById('toastMsg');
+        
+        toast.className = `toast-notification show ${typeClass}`;
+        text.innerText = msgText;
+        icon.setAttribute('data-lucide', iconName);
+        lucide.createIcons();
+        
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3500);
+      };
+      
+      if (statusInfo.configured && statusInfo.db) {
+        try {
+          // Write directly to an "enquiries" table or "contact_messages"
+          // We can record as a special status in enquiries
+          await statusInfo.db.collection('enquiries').add({
+            customerName: name,
+            mobileNumber: phone,
+            city: "N/A (Contact Form)",
+            state: "N/A (Contact Form)",
+            companyName: email || "N/A",
+            products: [{ name: "Direct Message", quantity: 1, composition: msg }],
+            totalItems: 1,
+            status: "New",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          
+          showToastMsg("Inquiry submitted successfully! We will contact you soon.", "check-circle", "toast-success");
+          document.getElementById('contactForm').reset();
+        } catch (error) {
+          console.error("Error sending message to Firebase:", error);
+          showToastMsg("Error submitting. Redirecting to WhatsApp...", "alert-triangle", "toast-warning");
+          setTimeout(() => {
+            const encoded = encodeURIComponent(`Hello Maa Sukriti Pharmaceuticals,\n\nI am contacting you from the website contact form:\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nMessage: ${msg}`);
+            window.open(`https://wa.me/919415021041?text=${encoded}`, '_blank');
+          }, 1500);
+        }
+      } else {
+        // Fallback for Mock demo mode
+        // Store in LocalStorage mock enquiries list
+        const mockEnquiries = JSON.parse(localStorage.getItem('mock_enquiries') || '[]');
+        const newEnq = {
+          id: 'enq_' + Date.now(),
+          customerName: name,
+          mobileNumber: phone,
+          city: "N/A (Contact Form)",
+          state: "N/A (Contact Form)",
+          companyName: email || "N/A",
+          products: [{ name: "Direct Contact Form Message", quantity: 1, composition: msg }],
+          totalItems: 1,
+          status: "New",
+          createdAt: new Date().toISOString()
+        };
+        mockEnquiries.push(newEnq);
+        localStorage.setItem('mock_enquiries', JSON.stringify(mockEnquiries));
+        
+        showToastMsg("Demo Mode: Enquiry saved to local database. Redirecting to WhatsApp...", "info", "toast-success");
+        
+        setTimeout(() => {
+          const encoded = encodeURIComponent(`Hello Maa Sukriti Pharmaceuticals,\n\nI am contacting you from the website contact form:\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nMessage: ${msg}`);
+          window.open(`https://wa.me/919415021041?text=${encoded}`, '_blank');
+          document.getElementById('contactForm').reset();
+        }, 1500);
+      }
+    }
+
+    // Initialize Lucide Icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>

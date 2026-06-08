@@ -1,0 +1,166 @@
+/* Maa Sukriti Pharmaceuticals - Responsive Layout Stylesheet */
+
+@media (max-width: 1024px) {
+  .hero-title {
+    font-size: 2.75rem;
+  }
+  
+  .highlights-container {
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: -30px;
+    gap: var(--spacing-sm);
+  }
+  
+  .why-us-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+  }
+  
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --spacing-lg: 1.75rem;
+    --spacing-xl: 3rem;
+  }
+  
+  .section {
+    padding: var(--spacing-xl) 0;
+  }
+  
+  /* Mobile Menu Styles */
+  .menu-toggle {
+    display: block;
+    order: 3;
+    padding: 0.5rem;
+  }
+  
+  .nav-links {
+    position: fixed;
+    top: 80px;
+    left: -100%;
+    width: 100%;
+    height: calc(100vh - 80px);
+    background-color: var(--white);
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: var(--spacing-lg);
+    gap: 1.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    transition: left 0.4s ease;
+    z-index: 99;
+  }
+  
+  .nav-links.active {
+    left: 0;
+  }
+  
+  .nav-link {
+    font-size: 1.15rem;
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem 0;
+  }
+  
+  .nav-link::after {
+    display: none;
+  }
+  
+  .nav-actions {
+    order: 2;
+  }
+  
+  /* Hero Section */
+  .hero {
+    padding: 40px 0 80px 0;
+  }
+  
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+    text-align: center;
+  }
+  
+  .hero-desc {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .hero-btns {
+    justify-content: center;
+  }
+  
+  .hero-image-wrapper {
+    order: -1;
+  }
+  
+  .hero-img {
+    max-width: 320px;
+  }
+  
+  .shape-1 {
+    width: 150px;
+    height: 150px;
+  }
+  
+  /* Other Sections */
+  .section-title {
+    font-size: 1.8rem;
+  }
+  
+  .why-us-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  
+  .certs-slider {
+    gap: var(--spacing-md);
+  }
+  
+  .cert-logo {
+    height: 55px;
+  }
+  
+  .whatsapp-float {
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 576px) {
+  .highlights-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .product-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .logo-text {
+    font-size: 1.2rem;
+  }
+  
+  .logo-img {
+    height: 40px;
+  }
+}
