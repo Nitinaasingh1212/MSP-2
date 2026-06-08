@@ -1,6 +1,7 @@
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const host = process.env.TIDB_HOST || process.env.DB_HOST;
 const port = parseInt(process.env.TIDB_PORT || process.env.DB_PORT || (process.env.TIDB_HOST ? '4000' : '3306'));

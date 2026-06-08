@@ -1,3 +1,6 @@
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
+
 const REQUIRED_ENV_VARS = [
   'DB_HOST',
   'DB_PORT',
