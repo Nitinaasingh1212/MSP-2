@@ -40,7 +40,7 @@ pages.forEach(p => {
 const adminPages = [
   { route: '/private-control-room/login.html', file: 'private-control-room/login.html' },
   { route: '/private-control-room/dashboard.html', file: 'private-control-room/dashboard.html' },
-  { route: '/private-control-room/products.html', file: 'private-control-room/products.html' },
+  { route: '/private-control-room/manage-products.html', file: 'private-control-room/manage-products.html' },
   { route: '/private-control-room/categories.html', file: 'private-control-room/categories.html' },
   { route: '/private-control-room/enquiries.html', file: 'private-control-room/enquiries.html' }
 ];

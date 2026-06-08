@@ -221,7 +221,7 @@ function renderDashboardCharts(products, categories, enquiries) {
 
 // 2. PRODUCT MANAGEMENT CRUD ENGINE
 async function initProductsManager() {
-  if (!window.location.pathname.includes("products.html")) return;
+  if (!window.location.pathname.includes("manage-products.html")) return;
   
   updateDBConnectionBadge();
   
@@ -886,7 +886,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const path = window.location.pathname;
   if (path.includes("dashboard.html")) {
     initDashboard();
-  } else if (path.includes("products.html") && path.includes("private-control-room")) {
+  } else if (path.includes("manage-products.html") && path.includes("private-control-room")) {
     initProductsManager();
   } else if (path.includes("categories.html")) {
     initCategoriesManager();
