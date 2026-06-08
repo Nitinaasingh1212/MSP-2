@@ -31,6 +31,42 @@ app.post('/api/login', require('../api-handlers/login'));
 app.post('/api/logout', require('../api-handlers/logout'));
 app.get('/api/check-auth', require('../api-handlers/check-auth'));
 
+app.get('/api/debug-paths', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  
+  const debugInfo = {
+    __dirname,
+    cwd: process.cwd(),
+    parentDirs: []
+  };
+
+  let current = __dirname;
+  for (let i = 0; i < 5; i++) {
+    current = path.dirname(current);
+    try {
+      debugInfo.parentDirs.push({
+        path: current,
+        contents: fs.readdirSync(current).map(f => {
+          try {
+            const stats = fs.statSync(path.join(current, f));
+            return `${f} (${stats.isDirectory() ? 'dir' : 'file'})`;
+          } catch (statErr) {
+            return `${f} (unknown)`;
+          }
+        })
+      });
+    } catch (e) {
+      debugInfo.parentDirs.push({
+        path: current,
+        error: e.message
+      });
+    }
+  }
+
+  res.json(debugInfo);
+});
+
 module.exports = app;
 module.exports.config = {
   api: {
