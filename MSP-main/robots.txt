@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /private-control-room/
+Disallow: /api/
+
+Sitemap: https://mspharma.in/sitemap.xml

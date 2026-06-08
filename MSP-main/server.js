@@ -27,7 +27,9 @@ const pages = [
   { route: '/product-details.html', file: 'product-details.html' },
   { route: '/cart.html', file: 'cart.html' },
   { route: '/about.html', file: 'about.html' },
-  { route: '/contact.html', file: 'contact.html' }
+  { route: '/contact.html', file: 'contact.html' },
+  { route: '/robots.txt', file: 'robots.txt' },
+  { route: '/sitemap.xml', file: 'sitemap.xml' }
 ];
 
 pages.forEach(p => {

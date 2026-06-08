@@ -251,6 +251,57 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("detailPackaging").innerText = product.packaging;
         document.getElementById("tabDescription").innerText = product.description;
         
+        // Dynamically update document title & meta tags for SEO
+        document.title = `${product.name} | Maa Sukriti Pharmaceuticals`;
+        
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+          metaDesc.setAttribute("content", `${product.name} (${product.composition}) - WHO-GMP certified formulation from Maa Sukriti Pharmaceuticals. Packaging: ${product.packaging}. ${product.description}`);
+        }
+        
+        // Dynamic Open Graph updates
+        const ogTitle = document.getElementById("ogTitle");
+        const ogDesc = document.getElementById("ogDesc");
+        const ogImage = document.getElementById("ogImage");
+        if (ogTitle) ogTitle.setAttribute("content", `${product.name} | Maa Sukriti Pharmaceuticals`);
+        if (ogDesc) ogDesc.setAttribute("content", `View composition and details for ${product.name} (${product.composition}). WHO-GMP certified manufacture.`);
+        if (ogImage && product.imageUrl) ogImage.setAttribute("content", product.imageUrl);
+        
+        // Dynamic Twitter updates
+        const twitterTitle = document.getElementById("twitterTitle");
+        const twitterDesc = document.getElementById("twitterDesc");
+        const twitterImage = document.getElementById("twitterImage");
+        if (twitterTitle) twitterTitle.setAttribute("content", `${product.name} | Maa Sukriti Pharmaceuticals`);
+        if (twitterDesc) twitterDesc.setAttribute("content", `View composition and details for ${product.name} (${product.composition}).`);
+        if (twitterImage && product.imageUrl) twitterImage.setAttribute("content", product.imageUrl);
+        
+        // Inject Product JSON-LD Schema
+        let schemaScript = document.getElementById("productDetailsSchema");
+        if (!schemaScript) {
+          schemaScript = document.createElement("script");
+          schemaScript.id = "productDetailsSchema";
+          schemaScript.type = "application/ld+json";
+          document.head.appendChild(schemaScript);
+        }
+        schemaScript.textContent = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": product.name,
+          "image": product.imageUrl || "https://mspharma.in/assets/logos/logo.png",
+          "description": product.description,
+          "category": product.category,
+          "offers": {
+            "@type": "AggregateOffer",
+            "priceCurrency": "INR",
+            "lowPrice": "0",
+            "offerCount": "1",
+            "seller": {
+              "@type": "Organization",
+              "name": "Maa Sukriti Pharmaceuticals"
+            }
+          }
+        });
+        
         // Image setup
         const detailImg = document.getElementById("detailImage");
         if (product.imageUrl) {

@@ -45,14 +45,16 @@
     left: -100%;
     width: 100%;
     height: calc(100vh - 80px);
-    background-color: var(--white);
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     padding-top: var(--spacing-lg);
     gap: 1.5rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-    transition: left 0.4s ease;
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 99;
   }
   
@@ -136,6 +138,54 @@
     width: 50px;
     height: 50px;
   }
+  
+  /* Mobile Catalog & Layout Fixes */
+  #catalogGrid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  #sidebarFilters {
+    position: static !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+    gap: var(--spacing-sm) !important;
+    padding: var(--spacing-sm) !important;
+    margin-bottom: var(--spacing-md) !important;
+  }
+  
+  #sidebarFilters > div {
+    margin-bottom: 0 !important;
+  }
+  
+  #categoriesFilterList {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+    gap: 0.35rem !important;
+  }
+  
+  .btn-category-filter {
+    padding: 0.35rem 0.75rem !important;
+    background-color: var(--gray-light) !important;
+    border: 1px solid var(--gray-medium) !important;
+    display: inline-block !important;
+    width: auto !important;
+    text-align: center !important;
+  }
+  
+  .btn-category-filter.active {
+    background-color: var(--primary) !important;
+    color: var(--white) !important;
+    border-color: var(--primary) !important;
+  }
+  
+  /* Dynamic Detail and Cart page mobile conversion */
+  #productDetailsWrapper,
+  #cartMainContainer {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-md) !important;
+  }
 }
 
 @media (max-width: 576px) {
@@ -157,10 +207,20 @@
   }
   
   .logo-text {
-    font-size: 1.2rem;
+    font-size: 1.05rem !important;
+    letter-spacing: -0.5px;
   }
   
   .logo-img {
-    height: 40px;
+    height: 35px !important;
+  }
+  
+  .logo-tagline {
+    font-size: 0.55rem !important;
+    letter-spacing: 1px !important;
+  }
+  
+  #sidebarFilters {
+    grid-template-columns: 1fr !important;
   }
 }
