@@ -80,10 +80,13 @@ module.exports = async (req, res) => {
     if (req.files && req.files.imageFile && req.files.imageFile[0]) {
       try {
         const imgBuffer = req.files.imageFile[0].buffer;
-        imageUrl = await uploadToCloudinary(imgBuffer, { folder: 'products' });
-      } catch (cloudinaryError) {
-        console.error('Cloudinary Image Upload Error in update API:', cloudinaryError);
-        return res.status(500).json({ error: `Cloudinary Image Upload failed: ${cloudinaryError.message}` });
+        imageUrl = await uploadToCloudinary(imgBuffer, { 
+          folder: 'products',
+          originalname: req.files.imageFile[0].originalname
+        });
+      } catch (uploadError) {
+        console.error('Image Upload Error in update API:', uploadError);
+        return res.status(500).json({ error: `Image Upload failed: ${uploadError.message}` });
       }
     }
 
@@ -91,10 +94,13 @@ module.exports = async (req, res) => {
     if (req.files && req.files.pdfFile && req.files.pdfFile[0]) {
       try {
         const pdfBuffer = req.files.pdfFile[0].buffer;
-        pdfUrl = await uploadToCloudinary(pdfBuffer, { folder: 'pdfs', resource_type: 'raw' });
-      } catch (cloudinaryError) {
-        console.error('Cloudinary PDF Upload Error in update API:', cloudinaryError);
-        return res.status(500).json({ error: `Cloudinary PDF Upload failed: ${cloudinaryError.message}` });
+        pdfUrl = await uploadToCloudinary(pdfBuffer, { 
+          folder: 'pdfs',
+          originalname: req.files.pdfFile[0].originalname
+        });
+      } catch (uploadError) {
+        console.error('PDF Upload Error in update API:', uploadError);
+        return res.status(500).json({ error: `PDF Upload failed: ${uploadError.message}` });
       }
     }
 

@@ -10,19 +10,11 @@ const REQUIRED_ENV_VARS = [
   'JWT_SECRET'
 ];
 
-const CLOUDINARY_VARS = [
-  'CLOUDINARY_CLOUD_NAME',
-  'CLOUDINARY_API_KEY',
-  'CLOUDINARY_API_SECRET'
-];
-
 function isPlaceholder(value) {
   if (!value) return true;
   const valLower = value.toLowerCase();
   return valLower.includes('your_') || valLower.includes('optional_');
 }
-
-let warnedAboutCloudinary = false;
 
 function validateEnv() {
   const missing = [];
@@ -35,13 +27,6 @@ function validateEnv() {
     const errorMsg = `Configuration Error: Missing or default required environment variable(s): ${missing.join(', ')}`;
     console.error(errorMsg);
     throw new Error(errorMsg);
-  }
-
-  // Soft check for Cloudinary configurations
-  const missingCloudinary = CLOUDINARY_VARS.filter(name => !process.env[name] || isPlaceholder(process.env[name]));
-  if (missingCloudinary.length > 0 && !warnedAboutCloudinary) {
-    console.warn(`[WARNING] Cloudinary image hosting is not fully configured (missing/placeholder: ${missingCloudinary.join(', ')}). Product image uploads will fail, but catalog reading and database connections will work.`);
-    warnedAboutCloudinary = true;
   }
 }
 

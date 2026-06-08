@@ -1,24 +1,37 @@
-const cloudinary = require('cloudinary').v2;
+const fs = require('fs');
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
 
 function uploadToCloudinary(fileBuffer, options = {}) {
   return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      options,
-      (error, result) => {
-        if (error) return reject(error);
-        resolve(result.secure_url);
+    try {
+      const folderName = options.folder || 'misc';
+      
+      // Define path relative to this file: ../assets/uploads/products or ../assets/uploads/pdfs
+      const uploadDir = path.join(__dirname, '../assets/uploads', folderName);
+      
+      // Ensure folder exists
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
       }
-    );
-    uploadStream.write(fileBuffer);
-    uploadStream.end();
+      
+      // Get file extension from originalname or default
+      const originalName = options.originalname || 'file';
+      const ext = path.extname(originalName) || (folderName === 'pdfs' ? '.pdf' : '.jpg');
+      
+      // Generate unique name
+      const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+      const filePath = path.join(uploadDir, filename);
+      
+      // Write buffer to disk
+      fs.writeFileSync(filePath, fileBuffer);
+      
+      // Return relative web URL
+      const relativeUrl = `/assets/uploads/${folderName}/${filename}`;
+      resolve(relativeUrl);
+    } catch (err) {
+      console.error('Local file write error:', err);
+      reject(err);
+    }
   });
 }
 
