@@ -14,6 +14,7 @@ app.use(cookieParser());
 app.get('/api/products', require('../api-handlers/products'));
 app.get('/api/product', require('../api-handlers/product'));
 app.post('/api/add-product', require('../api-handlers/add-product'));
+app.post('/api/update-product', require('../api-handlers/update-product'));
 app.put('/api/update-product', require('../api-handlers/update-product'));
 app.delete('/api/delete-product', require('../api-handlers/delete-product'));
 

@@ -35,8 +35,8 @@ module.exports = async (req, res) => {
       featured: r.featured === 'true' || r.featured === true,
       status: r.status,
       description: r.description,
-      imageUrl: r.image_url,
-      pdfUrl: r.pdf_url,
+      imageUrl: r.image_url ? (r.image_url.startsWith('http') || r.image_url.startsWith('/') ? r.image_url : `/assets/uploads/products/${r.image_url}`) : '',
+      pdfUrl: r.pdf_url ? (r.pdf_url.startsWith('http') || r.pdf_url.startsWith('/') ? r.pdf_url : `/assets/uploads/pdfs/${r.pdf_url}`) : '',
       createdAt: r.created_at
     };
 
