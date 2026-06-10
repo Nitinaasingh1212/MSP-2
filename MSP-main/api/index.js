@@ -106,6 +106,23 @@ app.get('/api/debug-paths', (req, res) => {
     debugInfo.publicReadBack = fs.readFileSync(testFilePath, 'utf8');
     debugInfo.publicHtmlContentsAfter = fs.readdirSync('/home/u413027252/domains/mspharma.in');
     
+    // Inspect DO_NOT_UPLOAD_HERE
+    const warnPath = '/home/u413027252/domains/mspharma.in/DO_NOT_UPLOAD_HERE';
+    if (fs.existsSync(warnPath)) {
+      try {
+        const stat = fs.statSync(warnPath);
+        if (stat.isFile()) {
+          debugInfo.warnContent = fs.readFileSync(warnPath, 'utf8');
+        } else {
+          debugInfo.warnContent = 'Directory contents: ' + JSON.stringify(fs.readdirSync(warnPath));
+        }
+      } catch (e) {
+        debugInfo.warnContent = 'Error reading: ' + e.message;
+      }
+    } else {
+      debugInfo.warnContent = 'Does not exist';
+    }
+    
     // Read live cloudinary.js content
     const cloudinaryPath = path.join(__dirname, '../lib/cloudinary.js');
     if (fs.existsSync(cloudinaryPath)) {
