@@ -74,7 +74,7 @@ async function fetchEnquiries() {
 
 // 1. DASHBOARD OVERVIEW ENGINE
 async function initDashboard() {
-  if (!window.location.pathname.includes("dashboard.html")) return;
+  if (!window.location.pathname.includes("dashboard")) return;
   
   updateDBConnectionBadge();
   
@@ -221,7 +221,7 @@ function renderDashboardCharts(products, categories, enquiries) {
 
 // 2. PRODUCT MANAGEMENT CRUD ENGINE
 async function initProductsManager() {
-  if (!window.location.pathname.includes("manage-products.html")) return;
+  if (!window.location.pathname.includes("manage-products")) return;
   
   updateDBConnectionBadge();
   
@@ -609,7 +609,7 @@ async function deleteProduct(prodId) {
 
 // 3. CATEGORY MANAGEMENT CRUD ENGINE
 async function initCategoriesManager() {
-  if (!window.location.pathname.includes("categories.html")) return;
+  if (!window.location.pathname.includes("categories")) return;
   
   updateDBConnectionBadge();
   
@@ -752,7 +752,7 @@ async function deleteCategory(catId) {
 let allFetchedEnquiries = [];
 
 async function initEnquiriesManager() {
-  if (!window.location.pathname.includes("enquiries.html")) return;
+  if (!window.location.pathname.includes("enquiries")) return;
   
   updateDBConnectionBadge();
   
@@ -926,7 +926,7 @@ async function updateModalEnquiryStatus(newStatus) {
   }
   
   // Reload
-  if (window.location.pathname.includes("dashboard.html")) {
+  if (window.location.pathname.includes("dashboard")) {
     initDashboard();
   } else {
     loadAdminEnquiriesTable();
@@ -968,13 +968,13 @@ function triggerProductsImport() {
 // Global router initialization for page actions
 document.addEventListener("DOMContentLoaded", () => {
   const path = window.location.pathname;
-  if (path.includes("dashboard.html")) {
+  if (path.includes("dashboard")) {
     initDashboard();
-  } else if (path.includes("manage-products.html") && path.includes("private-control-room")) {
+  } else if (path.includes("manage-products")) {
     initProductsManager();
-  } else if (path.includes("categories.html")) {
+  } else if (path.includes("categories")) {
     initCategoriesManager();
-  } else if (path.includes("enquiries.html") && path.includes("private-control-room")) {
+  } else if (path.includes("enquiries")) {
     initEnquiriesManager();
   }
 });

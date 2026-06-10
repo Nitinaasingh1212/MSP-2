@@ -13,6 +13,27 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  
+  <style>
+    .admin-image-upload-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+    @media (max-width: 768px) {
+      .admin-image-upload-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+    }
+    .file-input-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gray-dark);
+      display: block;
+      margin-bottom: 4px;
+    }
+  </style>
 </head>
 <body>
 
@@ -21,7 +42,7 @@
     <!-- Left Sidebar -->
     <aside class="admin-sidebar">
       <div class="admin-sidebar-top">
-        <a href="dashboard.html" class="logo-wrapper" style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
+        <a href="/admin-control/dashboard" class="logo-wrapper" style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
           <img src="../assets/logos/logo.png" alt="MSP Logo" class="logo-img" style="height:44px;">
           <div style="display:flex; flex-direction:column; gap:2px;">
             <div class="logo-text">MAA SUKRITI PHARMACEUTICALS</div>
@@ -30,22 +51,22 @@
         </a>
         <ul class="admin-sidebar-menu">
           <li>
-            <a href="dashboard.html" class="admin-sidebar-link">
+            <a href="/admin-control/dashboard" class="admin-sidebar-link">
               <i data-lucide="layout-dashboard" style="width:18px; height:18px;"></i> Dashboard
             </a>
           </li>
           <li>
-            <a href="manage-products.html" class="admin-sidebar-link active">
+            <a href="/admin-control/manage-products" class="admin-sidebar-link active">
               <i data-lucide="pill" style="width:18px; height:18px;"></i> Products
             </a>
           </li>
           <li>
-            <a href="categories.html" class="admin-sidebar-link">
+            <a href="/admin-control/categories" class="admin-sidebar-link">
               <i data-lucide="tag" style="width:18px; height:18px;"></i> Categories
             </a>
           </li>
           <li>
-            <a href="enquiries.html" class="admin-sidebar-link">
+            <a href="/admin-control/enquiries" class="admin-sidebar-link">
               <i data-lucide="mail" style="width:18px; height:18px;"></i> Enquiries
             </a>
           </li>
@@ -191,34 +212,25 @@
         <div class="form-group" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1rem;">
           <div>
             <label class="form-label">Product Images (Up to 3)</label>
-            <div style="display: flex; gap: 0.5rem; flex-direction: column;">
-              <div class="file-upload-wrapper" style="margin-bottom:0.25rem;">
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                  <span style="font-size: 0.85rem; font-weight: 600; min-width: 60px; color: var(--gray-dark);">Image 1:</span>
-                  <input type="file" id="formImageFile1" accept="image/*" class="form-control" style="padding: 4px;" onchange="previewFile(this, 'imgPreview1')">
-                </div>
-                <div class="file-preview" id="imgPreview1" style="margin-top: 2px; font-size: 0.8rem; display: none;">No image selected</div>
-              </div>
-              <div class="file-upload-wrapper" style="margin-bottom:0.25rem;">
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                  <span style="font-size: 0.85rem; font-weight: 600; min-width: 60px; color: var(--gray-dark);">Image 2:</span>
-                  <input type="file" id="formImageFile2" accept="image/*" class="form-control" style="padding: 4px;" onchange="previewFile(this, 'imgPreview2')">
-                </div>
-                <div class="file-preview" id="imgPreview2" style="margin-top: 2px; font-size: 0.8rem; display: none;">No image selected</div>
+            <div class="admin-image-upload-grid">
+              <div class="file-upload-wrapper">
+                <span class="file-input-label">Image 1</span>
+                <input type="file" id="formImageFile1" accept="image/*" class="form-control" style="padding: 4px;" onchange="previewFile(this, 'imgPreview1')">
               </div>
               <div class="file-upload-wrapper">
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                  <span style="font-size: 0.85rem; font-weight: 600; min-width: 60px; color: var(--gray-dark);">Image 3:</span>
-                  <input type="file" id="formImageFile3" accept="image/*" class="form-control" style="padding: 4px;" onchange="previewFile(this, 'imgPreview3')">
-                </div>
-                <div class="file-preview" id="imgPreview3" style="margin-top: 2px; font-size: 0.8rem; display: none;">No image selected</div>
+                <span class="file-input-label">Image 2</span>
+                <input type="file" id="formImageFile2" accept="image/*" class="form-control" style="padding: 4px;" onchange="previewFile(this, 'imgPreview2')">
+              </div>
+              <div class="file-upload-wrapper">
+                <span class="file-input-label">Image 3</span>
+                <input type="file" id="formImageFile3" accept="image/*" class="form-control" style="padding: 4px;" onchange="previewFile(this, 'imgPreview3')">
               </div>
             </div>
           </div>
           <div>
             <label class="form-label">Product Brochure (PDF)</label>
             <div class="file-upload-wrapper">
-              <div class="file-upload-box" id="pdfUploadBox" style="padding: 1rem 0.5rem;">
+              <div class="file-upload-box" id="pdfUploadBox" style="padding: 1.1rem 0.5rem;">
                 <i data-lucide="file-text" style="width:24px; height:24px;"></i>
                 <p style="font-size:0.75rem; font-weight:600; color:var(--gray-dark);">Drag & Drop PDF or Click</p>
                 <input type="file" id="formPdfFile" class="file-upload-input" accept="application/pdf" onchange="previewFile(this, 'pdfPreview')">

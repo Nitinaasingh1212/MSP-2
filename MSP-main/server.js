@@ -131,13 +131,18 @@ app.get('/product/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, 'product-details.html'));
 });
 
-// Serve Admin Pages (Dual-support: clean route and relative extension resolution)
+// 301 Redirect Admin Pages with .html to Clean URLs
+app.get('/admin-control/:page.html', (req, res) => {
+  res.redirect(301, `/admin-control/${req.params.page}`);
+});
+
+// Serve Admin Pages (Clean routes)
 const adminPages = [
-  { routes: ['/admin-control', '/admin-control/', '/admin-control/dashboard', '/admin-control/dashboard.html'], file: 'private-control-room/dashboard.html' },
-  { routes: ['/admin-control/login', '/admin-control/login.html'], file: 'private-control-room/login.html' },
-  { routes: ['/admin-control/manage-products', '/admin-control/manage-products.html'], file: 'private-control-room/manage-products.html' },
-  { routes: ['/admin-control/categories', '/admin-control/categories.html'], file: 'private-control-room/categories.html' },
-  { routes: ['/admin-control/enquiries', '/admin-control/enquiries.html'], file: 'private-control-room/enquiries.html' }
+  { routes: ['/admin-control', '/admin-control/', '/admin-control/dashboard'], file: 'private-control-room/dashboard.html' },
+  { routes: ['/admin-control/login'], file: 'private-control-room/login.html' },
+  { routes: ['/admin-control/manage-products'], file: 'private-control-room/manage-products.html' },
+  { routes: ['/admin-control/categories'], file: 'private-control-room/categories.html' },
+  { routes: ['/admin-control/enquiries'], file: 'private-control-room/enquiries.html' }
 ];
 
 adminPages.forEach(p => {
