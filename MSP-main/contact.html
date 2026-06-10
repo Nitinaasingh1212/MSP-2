@@ -27,10 +27,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/responsive.css">
   
-  <!-- Firebase SDK (Compat Version) -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
 </head>
 <body>
 
@@ -262,7 +259,6 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <!-- Custom JS Scripts -->
-  <script src="js/firebase-config.js"></script>
   <script src="js/cart.js"></script>
   
   <script>
@@ -282,8 +278,6 @@
       const phone = document.getElementById('contactPhone').value.trim();
       const msg = document.getElementById('contactMsg').value.trim();
       
-      const statusInfo = getFirebaseStatus();
-      
       // Toast notification helper function
       const showToastMsg = (msgText, iconName, typeClass) => {
         const toast = document.getElementById('toastBox');
@@ -300,33 +294,8 @@
         }, 3500);
       };
       
-      if (statusInfo.configured && statusInfo.db) {
-        try {
-          // Write directly to an "enquiries" table or "contact_messages"
-          // We can record as a special status in enquiries
-          await statusInfo.db.collection('enquiries').add({
-            customerName: name,
-            mobileNumber: phone,
-            city: "N/A (Contact Form)",
-            state: "N/A (Contact Form)",
-            companyName: email || "N/A",
-            products: [{ name: "Direct Message", quantity: 1, composition: msg }],
-            totalItems: 1,
-            status: "New",
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-          
-          showToastMsg("Inquiry submitted successfully! We will contact you soon.", "check-circle", "toast-success");
-          document.getElementById('contactForm').reset();
-        } catch (error) {
-          console.error("Error sending message to Firebase:", error);
-          showToastMsg("Error submitting. Redirecting to WhatsApp...", "alert-triangle", "toast-warning");
-          setTimeout(() => {
-            const encoded = encodeURIComponent(`Hello Maa Sukriti Pharmaceuticals,\n\nI am contacting you from the website contact form:\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nMessage: ${msg}`);
-            window.open(`https://wa.me/919415021041?text=${encoded}`, '_blank');
-          }, 1500);
-        }
-      } else {
+      // Save and redirect directly to WhatsApp (MySQL integration is handled on server side for carts, contact messages are routed to WhatsApp)
+      if (true) {
         // Fallback for Mock demo mode
         // Store in LocalStorage mock enquiries list
         const mockEnquiries = JSON.parse(localStorage.getItem('mock_enquiries') || '[]');
