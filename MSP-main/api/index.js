@@ -95,13 +95,19 @@ app.get('/api/debug-paths', (req, res) => {
     debugInfo.logsError = e.message;
   }
 
-  // Test writing to public_html
+  // Test writing and directory creation to public_html
   try {
-    const testPublicPath = path.join(__dirname, '../../public_html/test_write.txt');
-    fs.writeFileSync(testPublicPath, 'Write test successful at ' + new Date().toISOString());
-    debugInfo.publicWriteResult = 'SUCCESS: Wrote to ' + testPublicPath;
-    debugInfo.publicReadBack = fs.readFileSync(testPublicPath, 'utf8');
-    fs.unlinkSync(testPublicPath);
+    const testDir = path.join(__dirname, '../../public_html/assets/uploads/products');
+    fs.mkdirSync(testDir, { recursive: true });
+    const testFilePath = path.join(testDir, 'test_write.txt');
+    fs.writeFileSync(testFilePath, 'Write test successful at ' + new Date().toISOString());
+    
+    debugInfo.publicWriteResult = 'SUCCESS: Created ' + testDir + ' and wrote test_write.txt';
+    debugInfo.publicReadBack = fs.readFileSync(testFilePath, 'utf8');
+    debugInfo.publicHtmlContentsAfter = fs.readdirSync(path.join(__dirname, '../../public_html'));
+    
+    // Clean up
+    fs.unlinkSync(testFilePath);
   } catch (err) {
     debugInfo.publicWriteResult = 'FAILED: ' + err.message;
   }
