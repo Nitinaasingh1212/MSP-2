@@ -450,7 +450,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             thumbContainer.style.display = "none";
           }
         } else {
-          detailImg.src = `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%23f1f5f9"/><text x="50" y="55" font-size="28" text-anchor="middle">💊</text></svg>`;
+          detailImg.src = `data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><rect width='100' height='100' fill='%23f1f5f9'/><text x='50' y='55' font-size='28' text-anchor='middle'>💊</text></svg>`;
           detailImg.style.cursor = "default";
           detailImg.onclick = null;
           if (thumbContainer) thumbContainer.style.display = "none";

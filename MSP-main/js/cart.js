@@ -137,26 +137,28 @@ function renderCartPage() {
     totalQty += item.quantity;
     
     // Default image icon fallback
-    const imageSvg = `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%23f1f5f9"/><text x="50" y="55" font-size="28" text-anchor="middle">💊</text></svg>`;
+    const imageSvg = `data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><rect width='100' height='100' fill='%23f1f5f9'/><text x='50' y='55' font-size='28' text-anchor='middle'>💊</text></svg>`;
     const itemImg = item.imageUrl && isValidImageUrl(item.imageUrl) ? item.imageUrl : imageSvg;
     
     html += `
       <div class="cart-item-row" id="item_${item.productId}">
-        <div style="background-color: var(--gray-light); width: 60px; height: 60px; border-radius: var(--radius-sm); overflow: hidden; display: flex; align-items: center; justify-content: center;">
-          <img src="${itemImg}" alt="${item.name}" style="max-height: 100%; max-width: 100%; object-fit: contain; padding: 2px;">
+        <div class="cart-item-details">
+          <div class="cart-item-image-container">
+            <img src="${itemImg}" alt="${item.name}">
+          </div>
+          <div class="cart-item-info">
+            <span class="cart-item-category">${item.category}</span>
+            <h4 class="cart-item-name">${item.name}</h4>
+          </div>
         </div>
-        <div>
-          <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--secondary);">${item.category}</span>
-          <h4 style="font-size: 1rem; margin-top: 2px;">${item.name}</h4>
-        </div>
-        <div class="cart-item-actions-cell" style="display: flex; align-items: center; border: 1.5px solid var(--gray-light); border-radius: var(--radius-sm); overflow: hidden; height: 32px; width: fit-content; background-color: var(--light);">
-          <button onclick="changeCartQty('${item.productId}', -10)" style="border: none; background: none; width: 24px; height: 100%; font-weight: 800; cursor: pointer;">-</button>
-          <input type="number" value="${item.quantity}" min="1" onchange="updateCartQuantity('${item.productId}', this.value)" style="border: none; width: 44px; text-align: center; font-weight: 700; background: none; font-size: 0.85rem; outline: none;">
-          <button onclick="changeCartQty('${item.productId}', 10)" style="border: none; background: none; width: 24px; height: 100%; font-weight: 800; cursor: pointer;">+</button>
-        </div>
-        <div style="text-align: right;">
-          <button onclick="removeFromCart('${item.productId}')" style="background: none; border: none; color: var(--error); cursor: pointer; padding: 0.5rem;" title="Remove Product">
-            <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
+        <div class="cart-item-controls">
+          <div class="cart-item-qty-selector">
+            <button onclick="changeCartQty('${item.productId}', -10)">-</button>
+            <input type="number" value="${item.quantity}" min="1" onchange="updateCartQuantity('${item.productId}', this.value)">
+            <button onclick="changeCartQty('${item.productId}', 10)">+</button>
+          </div>
+          <button onclick="removeFromCart('${item.productId}')" class="cart-item-remove-btn" title="Remove Product">
+            <i data-lucide="trash-2"></i>
           </button>
         </div>
       </div>
