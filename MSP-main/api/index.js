@@ -81,6 +81,20 @@ app.get('/api/debug-paths', (req, res) => {
     debugInfo.uploadsContents = ['Error parent: ' + e.message];
   }
 
+  // 4. Read logs
+  const consoleLogPath = path.join(__dirname, '../console.log');
+  const stderrLogPath = path.join(__dirname, '../stderr.log');
+  try {
+    if (fs.existsSync(consoleLogPath)) {
+      debugInfo.consoleLog = fs.readFileSync(consoleLogPath, 'utf8').split('\n').slice(-50).join('\n');
+    }
+    if (fs.existsSync(stderrLogPath)) {
+      debugInfo.stderrLog = fs.readFileSync(stderrLogPath, 'utf8').split('\n').slice(-50).join('\n');
+    }
+  } catch (e) {
+    debugInfo.logsError = e.message;
+  }
+
   res.json(debugInfo);
 });
 
