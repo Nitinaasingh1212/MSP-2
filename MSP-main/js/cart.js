@@ -20,7 +20,7 @@ function saveCart(cart) {
   updateCartBadge();
   
   // If on cart page, re-render
-  if (window.location.pathname.includes("cart.html")) {
+  if (document.getElementById("cartItemsList")) {
     renderCartPage();
   }
 }
@@ -184,7 +184,7 @@ function showToastNotification(msg, icon = "info", type = "toast-success") {
 // Initialize badge and page on load
 document.addEventListener("DOMContentLoaded", () => {
   updateCartBadge();
-  if (window.location.pathname.includes("cart.html")) {
+  if (document.getElementById("cartItemsList")) {
     renderCartPage();
   }
 });

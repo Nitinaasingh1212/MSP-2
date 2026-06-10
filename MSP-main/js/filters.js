@@ -64,9 +64,13 @@ async function initCatalog() {
   const container = document.getElementById("catalogProductsContainer");
   if (!container) return; // not on products catalog page
   
-  // 1. Fetch categories
-  const categories = await fetchCategories();
-  
+  // 1. Fetch categories and products in parallel for faster loading
+  const [categories, products] = await Promise.all([
+    fetchCategories(),
+    fetchProducts()
+  ]);
+  allCatalogProducts = products;
+
   // Render filters sidebar
   const categoriesList = document.getElementById("categoriesFilterList");
   if (categoriesList) {
@@ -102,9 +106,6 @@ async function initCatalog() {
       });
     });
   }
-  
-  // 2. Load all products
-  allCatalogProducts = await fetchProducts();
   
   // 3. Parse URL pathname for category page URLs (e.g. /products/capsules)
   const path = window.location.pathname;

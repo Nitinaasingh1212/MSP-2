@@ -79,50 +79,59 @@ async function initDB() {
             await pool.query('ALTER TABLE products ADD COLUMN images JSON');
           }
 
-          // Data migrations: update null/empty slugs, images, display_order
-          const [rows] = await pool.query('SELECT id, name, image_url, slug, display_order, images FROM products');
-          for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
-            let needsUpdate = false;
-            let updateSql = 'UPDATE products SET ';
-            let updateParams = [];
-            
-            if (!row.slug) {
-              const baseSlug = generateSlug(row.name);
-              // Make baseSlug unique
-              let uniqueSlug = baseSlug;
-              let counter = 1;
-              while (true) {
-                const [existing] = await pool.query('SELECT id FROM products WHERE slug = ? AND id != ?', [uniqueSlug, row.id]);
-                if (existing.length === 0) break;
-                uniqueSlug = `${baseSlug}-${counter}`;
-                counter++;
+          // Data migrations: only run if there are null/empty slugs, images or unassigned display orders
+          const [[{ count }]] = await pool.query(
+            'SELECT COUNT(*) as count FROM products WHERE slug IS NULL OR images IS NULL OR display_order IS NULL OR display_order = 0'
+          );
+          
+          if (count > 0) {
+            console.log(`Migration: Found ${count} rows needing data upgrade. Running migrations...`);
+            const [rows] = await pool.query('SELECT id, name, image_url, slug, display_order, images FROM products');
+            for (let i = 0; i < rows.length; i++) {
+              const row = rows[i];
+              let needsUpdate = false;
+              let updateSql = 'UPDATE products SET ';
+              let updateParams = [];
+              
+              if (!row.slug) {
+                const baseSlug = generateSlug(row.name);
+                // Make baseSlug unique
+                let uniqueSlug = baseSlug;
+                let counter = 1;
+                while (true) {
+                  const [existing] = await pool.query('SELECT id FROM products WHERE slug = ? AND id != ?', [uniqueSlug, row.id]);
+                  if (existing.length === 0) break;
+                  uniqueSlug = `${baseSlug}-${counter}`;
+                  counter++;
+                }
+                updateSql += 'slug = ?, ';
+                updateParams.push(uniqueSlug);
+                needsUpdate = true;
               }
-              updateSql += 'slug = ?, ';
-              updateParams.push(uniqueSlug);
-              needsUpdate = true;
+              
+              if (row.display_order === null || row.display_order === 0) {
+                updateSql += 'display_order = ?, ';
+                updateParams.push(i + 1);
+                needsUpdate = true;
+              }
+              
+              if (!row.images) {
+                const defaultImagesArray = row.image_url ? [row.image_url] : [];
+                updateSql += 'images = ?, ';
+                updateParams.push(JSON.stringify(defaultImagesArray));
+                needsUpdate = true;
+              }
+              
+              if (needsUpdate) {
+                updateSql = updateSql.slice(0, -2) + ' WHERE id = ?';
+                updateParams.push(row.id);
+                await pool.query(updateSql, updateParams);
+              }
             }
-            
-            if (row.display_order === null || row.display_order === 0) {
-              updateSql += 'display_order = ?, ';
-              updateParams.push(i + 1);
-              needsUpdate = true;
-            }
-            
-            if (!row.images) {
-              const defaultImagesArray = row.image_url ? [row.image_url] : [];
-              updateSql += 'images = ?, ';
-              updateParams.push(JSON.stringify(defaultImagesArray));
-              needsUpdate = true;
-            }
-            
-            if (needsUpdate) {
-              updateSql = updateSql.slice(0, -2) + ' WHERE id = ?';
-              updateParams.push(row.id);
-              await pool.query(updateSql, updateParams);
-            }
+            console.log('Database data migrations completed successfully.');
+          } else {
+            console.log('Database schema is up to date. No data migrations needed.');
           }
-          console.log('Database schema and data migrations completed successfully.');
         } catch (migrationErr) {
           console.error('Failed to run database migrations:', migrationErr);
         }
