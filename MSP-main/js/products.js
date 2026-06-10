@@ -259,8 +259,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (productsInCat.length > 0) {
             // Sort products by display_order ASC, then by name ASC
             productsInCat.sort((a, b) => {
-              const orderA = parseInt(a.displayOrder) || 0;
-              const orderB = parseInt(b.displayOrder) || 0;
+              const orderA = parseInt(a.displayOrder) || 999999;
+              const orderB = parseInt(b.displayOrder) || 999999;
               if (orderA !== orderB) {
                 return orderA - orderB;
               }

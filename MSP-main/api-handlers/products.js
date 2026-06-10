@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
       query += ' WHERE status = ?';
       params.push('active');
     }
-    query += ' ORDER BY display_order ASC, name ASC, id ASC';
+    query += ' ORDER BY CASE WHEN display_order = 0 THEN 999999 ELSE display_order END ASC, name ASC, id ASC';
 
     const [rows] = await db.query(query, params);
     

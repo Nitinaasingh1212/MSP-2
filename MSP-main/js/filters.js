@@ -64,10 +64,12 @@ async function initCatalog() {
   const container = document.getElementById("catalogProductsContainer");
   if (!container) return; // not on products catalog page
   
-  // 1. Fetch categories & render filters sidebar
+  // 1. Fetch categories
+  const categories = await fetchCategories();
+  
+  // Render filters sidebar
   const categoriesList = document.getElementById("categoriesFilterList");
   if (categoriesList) {
-    const categories = await fetchCategories();
     // Keep the "All" button and append other active categories
     categories.forEach(cat => {
       categoriesList.innerHTML += `
@@ -109,15 +111,11 @@ async function initCatalog() {
   let urlCategory = null;
   if (path.includes('/products/')) {
     const catSlug = path.split('/products/').pop().split('/').shift().toLowerCase();
-    const catMapping = {
-      'capsules': 'Capsules',
-      'injections': 'Injections',
-      'syrups': 'Syrups',
-      'tablets': 'Tablets',
-      'veterinary': 'Veterinary'
-    };
-    if (catMapping[catSlug]) {
-      urlCategory = catMapping[catSlug];
+    const foundCat = categories.find(c => c.name.toLowerCase() === catSlug);
+    if (foundCat) {
+      urlCategory = foundCat.name;
+    } else {
+      urlCategory = catSlug.charAt(0).toUpperCase() + catSlug.slice(1);
     }
   }
   
@@ -248,26 +246,49 @@ function applyFiltersAndRender() {
   // Get filtered products list
   const filtered = getFilteredProducts();
   
-  // Define categories to show in exact required order
+  // Define core categories to prioritize in display order
   const CATEGORY_ORDER = ["Capsules", "Injections", "Syrups", "Tablets", "Veterinary"];
+  
+  // Find all unique categories represented in the filtered products list
+  const representedCategories = [...new Set(filtered.map(p => p.category))];
+  
+  let categoriesToRender = [];
+  if (activeCategory === "all") {
+    // Sort categories based on predefined order first, then append any remaining ones
+    CATEGORY_ORDER.forEach(cat => {
+      const found = representedCategories.find(c => c.toLowerCase() === cat.toLowerCase());
+      if (found) {
+        categoriesToRender.push(found);
+      }
+    });
+    representedCategories.forEach(cat => {
+      if (!categoriesToRender.some(c => c.toLowerCase() === cat.toLowerCase())) {
+        categoriesToRender.push(cat);
+      }
+    });
+  } else {
+    // Find the matching category with correct case
+    const found = representedCategories.find(c => c.toLowerCase() === activeCategory.toLowerCase());
+    if (found) {
+      categoriesToRender.push(found);
+    } else {
+      // If not represented in the filtered list but is active category, still add it
+      categoriesToRender.push(activeCategory);
+    }
+  }
   
   let html = "";
   let totalDisplayed = 0;
   
-  // Determine which categories we need to display
-  const categoriesToRender = activeCategory === "all"
-    ? CATEGORY_ORDER
-    : CATEGORY_ORDER.filter(cat => cat.toLowerCase() === activeCategory.toLowerCase());
-    
   categoriesToRender.forEach(catName => {
     // Filter matching products in this category
     const productsInCat = filtered.filter(p => p.category.toLowerCase() === catName.toLowerCase());
     
     if (productsInCat.length > 0) {
-      // Sort products within category: display_order ASC, then name ASC
+      // Sort products within category: display_order ASC (where 0 goes last), then name ASC
       productsInCat.sort((a, b) => {
-        const orderA = parseInt(a.displayOrder) || 0;
-        const orderB = parseInt(b.displayOrder) || 0;
+        const orderA = parseInt(a.displayOrder) || 999999;
+        const orderB = parseInt(b.displayOrder) || 999999;
         if (orderA !== orderB) {
           return orderA - orderB;
         }

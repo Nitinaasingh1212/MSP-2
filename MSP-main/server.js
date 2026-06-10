@@ -43,6 +43,11 @@ app.get(['/product-details.html', '/product-details'], async (req, res) => {
   res.redirect(301, '/products');
 });
 
+// Redirect base /product/ or /product to /products to handle broken links or back-button empty states
+app.get(['/product', '/product/'], (req, res) => {
+  res.redirect(301, '/products');
+});
+
 // 301 Redirect Legacy Admin Panel Routes to New hidden admin route
 app.get('/private-control-room', (req, res) => {
   res.redirect(301, '/admin-control');
@@ -133,12 +138,7 @@ app.get('/product/:slug', (req, res) => {
 
 // Serve Dynamic SEO Product Category page
 app.get('/products/:category', (req, res, next) => {
-  const allowedCategories = ['capsules', 'injections', 'syrups', 'tablets', 'veterinary'];
-  if (allowedCategories.includes(req.params.category.toLowerCase())) {
-    res.sendFile(path.join(__dirname, 'products.html'));
-  } else {
-    next();
-  }
+  res.sendFile(path.join(__dirname, 'products.html'));
 });
 
 // 301 Redirect Admin Pages with .html to Clean URLs
