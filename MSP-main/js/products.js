@@ -331,6 +331,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const product = await fetchProductById(idOrSlug, isSlug);
       if (product) {
         window.currentProductId = product.id;
+        window.currentProductImageUrl = product.imageUrl;
         document.getElementById("bannerTitle").innerText = product.name;
         document.getElementById("breadcrumbActive").innerText = product.name;
         document.getElementById("detailName").innerText = product.name;
@@ -499,7 +500,7 @@ function generateProductCardHTML(p) {
         
         <div class="product-footer">
           <a href="/product/${p.slug || p.id}" class="btn btn-outline btn-sm">Details</a>
-          <button class="btn btn-primary btn-sm" onclick="addToEnquiryCartDirect('${p.id}', '${p.name.replace(/'/g, "\\'")}', '${p.category}')">
+          <button class="btn btn-primary btn-sm" onclick="addToEnquiryCartDirect('${p.id}', '${p.name.replace(/'/g, "\\'")}', '${p.category}', '${validImage}')">
             <i data-lucide="shopping-cart"></i> Add
           </button>
         </div>
@@ -509,8 +510,8 @@ function generateProductCardHTML(p) {
 }
 
 // Add to Enquiry Cart Helper
-function addToEnquiryCartDirect(id, name, category) {
-  addToCart(id, name, category, 10); // default qty is 10 packs
+function addToEnquiryCartDirect(id, name, category, imageUrl = "") {
+  addToCart(id, name, category, 10, imageUrl); // default qty is 10 packs
   showToastNotification(`Added ${name} to Cart`, "check-circle", "toast-success");
 }
 
@@ -526,7 +527,8 @@ function addProductToEnquiryCart() {
     return;
   }
   
-  addToCart(id, name, category, qty);
+  const imageUrl = window.currentProductImageUrl || "";
+  addToCart(id, name, category, qty, imageUrl);
   showToastNotification(`Added ${qty} packs of ${name} to Enquiry Cart.`, "check-circle", "toast-success");
 }
 

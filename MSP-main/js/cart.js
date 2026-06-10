@@ -2,6 +2,26 @@
 
 const CART_STORAGE_KEY = "msp_bharat_cart";
 
+// Helper to validate if an image URL is correct and has a filename
+function isValidImageUrl(url) {
+  if (!url) return false;
+  const clean = url.trim().toLowerCase();
+  
+  if (clean === '/assets/uploads/products/' || clean === '/assets/uploads/products' || clean.endsWith('/')) return false;
+  if (clean.includes('undefined') || clean.includes('null')) return false;
+  if (clean.startsWith('data:')) return true;
+  
+  const pathname = clean.split('?')[0].split('#')[0];
+  
+  return pathname.endsWith('.jpg') || 
+         pathname.endsWith('.jpeg') || 
+         pathname.endsWith('.png') || 
+         pathname.endsWith('.gif') || 
+         pathname.endsWith('.webp') || 
+         pathname.endsWith('.svg') ||
+         pathname.endsWith('.bmp');
+}
+
 // Load cart items
 function getCart() {
   const data = localStorage.getItem(CART_STORAGE_KEY);
@@ -26,14 +46,15 @@ function saveCart(cart) {
 }
 
 // Add item to cart
-function addToCart(productId, name, category, quantity = 10) {
+function addToCart(productId, name, category, quantity = 10, imageUrl = "") {
   const cart = getCart();
   const index = cart.findIndex(item => item.productId === productId);
   
   if (index !== -1) {
     cart[index].quantity = parseInt(cart[index].quantity) + parseInt(quantity);
+    if (imageUrl) cart[index].imageUrl = imageUrl;
   } else {
-    cart.push({ productId, name, category, quantity: parseInt(quantity) });
+    cart.push({ productId, name, category, quantity: parseInt(quantity), imageUrl });
   }
   
   saveCart(cart);
@@ -117,11 +138,12 @@ function renderCartPage() {
     
     // Default image icon fallback
     const imageSvg = `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%23f1f5f9"/><text x="50" y="55" font-size="28" text-anchor="middle">💊</text></svg>`;
+    const itemImg = item.imageUrl && isValidImageUrl(item.imageUrl) ? item.imageUrl : imageSvg;
     
     html += `
       <div class="cart-item-row" id="item_${item.productId}">
         <div style="background-color: var(--gray-light); width: 60px; height: 60px; border-radius: var(--radius-sm); overflow: hidden; display: flex; align-items: center; justify-content: center;">
-          <img src="${imageSvg}" alt="pharma" style="max-height: 80%; max-width: 80%;">
+          <img src="${itemImg}" alt="${item.name}" style="max-height: 100%; max-width: 100%; object-fit: contain; padding: 2px;">
         </div>
         <div>
           <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--secondary);">${item.category}</span>
