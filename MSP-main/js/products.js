@@ -232,9 +232,58 @@ document.addEventListener("DOMContentLoaded", async () => {
         featuredContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--gray-dark);">No featured products available currently.</div>`;
       } else {
         featuredContainer.innerHTML = "";
-        featured.slice(0, 6).forEach(p => {
-          featuredContainer.innerHTML += generateProductCardHTML(p);
+        
+        const CATEGORY_ORDER = ["Capsules", "Injections", "Syrups", "Tablets", "Veterinary"];
+        
+        // Find represented categories in featured products
+        const representedCategories = [...new Set(featured.map(p => p.category))];
+        
+        // Sort categories based on required order
+        const sortedCategories = [];
+        CATEGORY_ORDER.forEach(cat => {
+          const found = representedCategories.find(c => c.toLowerCase() === cat.toLowerCase());
+          if (found) {
+            sortedCategories.push(found);
+          }
         });
+        representedCategories.forEach(cat => {
+          if (!sortedCategories.some(c => c.toLowerCase() === cat.toLowerCase())) {
+            sortedCategories.push(cat);
+          }
+        });
+        
+        let html = "";
+        sortedCategories.forEach(catName => {
+          const productsInCat = featured.filter(p => p.category.toLowerCase() === catName.toLowerCase());
+          
+          if (productsInCat.length > 0) {
+            // Sort products by display_order ASC, then by name ASC
+            productsInCat.sort((a, b) => {
+              const orderA = parseInt(a.displayOrder) || 0;
+              const orderB = parseInt(b.displayOrder) || 0;
+              if (orderA !== orderB) {
+                return orderA - orderB;
+              }
+              return a.name.localeCompare(b.name);
+            });
+            
+            // Render Category Heading
+            html += `
+              <div class="category-section-header" style="grid-column: 1 / -1; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid var(--primary); padding-bottom: 0.5rem;">
+                <h3 style="font-size: 1.5rem; color: var(--primary); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin: 0;">
+                  ${catName}
+                </h3>
+              </div>
+            `;
+            
+            // Render products
+            productsInCat.forEach(p => {
+              html += generateProductCardHTML(p);
+            });
+          }
+        });
+        
+        featuredContainer.innerHTML = html;
         lucide.createIcons();
       }
     }
