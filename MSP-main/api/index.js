@@ -95,16 +95,16 @@ app.get('/api/debug-paths', (req, res) => {
     debugInfo.logsError = e.message;
   }
 
-  // Test writing and directory creation to public_html
+  // Test writing and directory creation to /home/u413027252/domains/mspharma.in/uploads
   try {
-    const testDir = path.join(__dirname, '../../public_html/assets/uploads/products');
+    const testDir = '/home/u413027252/domains/mspharma.in/uploads/products';
     fs.mkdirSync(testDir, { recursive: true });
     const testFilePath = path.join(testDir, 'test_write.txt');
     fs.writeFileSync(testFilePath, 'Write test successful at ' + new Date().toISOString());
     
     debugInfo.publicWriteResult = 'SUCCESS: Created ' + testDir + ' and wrote test_write.txt';
     debugInfo.publicReadBack = fs.readFileSync(testFilePath, 'utf8');
-    debugInfo.publicHtmlContentsAfter = fs.readdirSync(path.join(__dirname, '../../public_html'));
+    debugInfo.publicHtmlContentsAfter = fs.readdirSync('/home/u413027252/domains/mspharma.in');
     
     // Read live cloudinary.js content
     const cloudinaryPath = path.join(__dirname, '../lib/cloudinary.js');
