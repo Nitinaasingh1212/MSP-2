@@ -276,6 +276,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         });
         
+        const isMobile = window.innerWidth <= 768;
+        
         let html = "";
         sortedCategories.forEach(catName => {
           const productsInCat = featured.filter(p => p.category.toLowerCase() === catName.toLowerCase());
@@ -300,10 +302,24 @@ document.addEventListener("DOMContentLoaded", async () => {
               </div>
             `;
             
+            // If mobile, show only the first featured product card
+            const productsToDisplay = isMobile ? productsInCat.slice(0, 1) : productsInCat;
+            
             // Render products
-            productsInCat.forEach(p => {
+            productsToDisplay.forEach(p => {
               html += generateProductCardHTML(p);
             });
+            
+            // Add redirect to full catalog category page on mobile
+            if (isMobile) {
+              html += `
+                <div style="grid-column: 1 / -1; text-align: center; margin: 1rem 0 2rem 0; width: 100%;">
+                  <button onclick="window.location.href='/products/${catName.toLowerCase()}'" class="btn btn-outline" style="width: 100%; max-width: 320px; font-weight: 700; padding: 0.6rem var(--spacing-sm); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; border-color: var(--primary); color: var(--primary);">
+                    View All ${catName} →
+                  </button>
+                </div>
+              `;
+            }
           }
         });
         
