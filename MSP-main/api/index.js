@@ -40,57 +40,45 @@ app.get('/api/debug-paths', (req, res) => {
   const debugInfo = {
     __dirname,
     cwd: process.cwd(),
-    parentDirs: [],
-    localUploads: [],
-    publicUploads: []
+    publicHtmlContents: [],
+    assetsContents: [],
+    uploadsContents: []
   };
 
-  // 1. Scan Parent Directories
-  let current = __dirname;
-  for (let i = 0; i < 5; i++) {
-    current = path.dirname(current);
-    try {
-      debugInfo.parentDirs.push({
-        path: current,
-        contents: fs.readdirSync(current).map(f => {
-          try {
-            const stats = fs.statSync(path.join(current, f));
-            return `${f} (${stats.isDirectory() ? 'dir' : 'file'})`;
-          } catch (statErr) {
-            return `${f} (unknown)`;
-          }
-        })
-      });
-    } catch (e) {
-      debugInfo.parentDirs.push({
-        path: current,
-        error: e.message
-      });
-    }
-  }
-
-  // 2. Scan Local Uploads
-  const localDir = path.join(__dirname, '../assets/uploads/products');
+  // 1. Scan public_html contents
+  const publicHtml = path.join(__dirname, '../../public_html');
   try {
-    if (fs.existsSync(localDir)) {
-      debugInfo.localUploads = fs.readdirSync(localDir);
+    if (fs.existsSync(publicHtml)) {
+      debugInfo.publicHtmlContents = fs.readdirSync(publicHtml);
     } else {
-      debugInfo.localUploads = ['Directory does not exist'];
+      debugInfo.publicHtmlContents = ['public_html does not exist at ' + publicHtml];
     }
   } catch (e) {
-    debugInfo.localUploads = ['Error: ' + e.message];
+    debugInfo.publicHtmlContents = ['Error public_html: ' + e.message];
   }
 
-  // 3. Scan Public Uploads
-  const publicDir = path.join(__dirname, '../../public_html/assets/uploads/products');
+  // 2. Scan nodejs/assets contents
+  const assets = path.join(__dirname, '../assets');
   try {
-    if (fs.existsSync(publicDir)) {
-      debugInfo.publicUploads = fs.readdirSync(publicDir);
+    if (fs.existsSync(assets)) {
+      debugInfo.assetsContents = fs.readdirSync(assets);
     } else {
-      debugInfo.publicUploads = ['Directory does not exist'];
+      debugInfo.assetsContents = ['assets does not exist at ' + assets];
     }
   } catch (e) {
-    debugInfo.publicUploads = ['Error: ' + e.message];
+    debugInfo.assetsContents = ['Error assets: ' + e.message];
+  }
+
+  // 3. Scan for any directory named 'uploads' or 'products' in parent folders
+  const parentOfNode = path.join(__dirname, '../..');
+  try {
+    debugInfo.uploadsContents = fs.readdirSync(parentOfNode).filter(f => {
+      try {
+        return fs.statSync(path.join(parentOfNode, f)).isDirectory();
+      } catch(e) { return false; }
+    });
+  } catch (e) {
+    debugInfo.uploadsContents = ['Error parent: ' + e.message];
   }
 
   res.json(debugInfo);
