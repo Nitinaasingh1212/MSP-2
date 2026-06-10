@@ -233,6 +233,34 @@ function getFilteredProducts() {
   });
 }
 
+// Direct click handler for mobile "View All" buttons
+window.filterByCategoryDirect = function(catName) {
+  activeCategory = catName;
+  currentPage = 1;
+  
+  // Mark the top category filter button active
+  document.querySelectorAll(".btn-category-filter").forEach(btn => {
+    if (btn.getAttribute("data-category").toLowerCase() === catName.toLowerCase()) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+  
+  // Update URL path for clean category routing
+  window.history.pushState({}, "", `/products/${catName.toLowerCase()}`);
+  updateSEOHeaders(catName);
+  
+  // Re-render list
+  applyFiltersAndRender();
+  
+  // Smooth scroll back to search container area
+  const scrollTarget = document.getElementById("searchInput") || document.querySelector(".page-banner");
+  if (scrollTarget) {
+    scrollTarget.scrollIntoView({ behavior: "smooth" });
+  }
+};
+
 // Core filter, sort, and paginate compiler
 function applyFiltersAndRender() {
   const container = document.getElementById("catalogProductsContainer");
@@ -278,6 +306,10 @@ function applyFiltersAndRender() {
     }
   }
   
+  // Check if we are on mobile (under 768px) and browsing "All Products"
+  const isMobile = window.innerWidth <= 768;
+  const showSummaryView = isMobile && activeCategory === "all";
+  
   let html = "";
   let totalDisplayed = 0;
   
@@ -305,11 +337,25 @@ function applyFiltersAndRender() {
         </div>
       `;
       
+      // If mobile summary view, show only the first product of the category
+      const productsToDisplay = showSummaryView ? productsInCat.slice(0, 1) : productsInCat;
+      
       // Render cards
-      productsInCat.forEach(p => {
+      productsToDisplay.forEach(p => {
         html += generateProductCardHTML(p);
         totalDisplayed++;
       });
+      
+      // Add "View All" link button if we truncated products in this category
+      if (showSummaryView && productsInCat.length > 1) {
+        html += `
+          <div style="grid-column: 1 / -1; text-align: center; margin: 1rem 0 2rem 0; width: 100%;">
+            <button onclick="filterByCategoryDirect('${catName.replace(/'/g, "\\'")}')" class="btn btn-outline" style="width: 100%; max-width: 320px; font-weight: 700; padding: 0.6rem var(--spacing-sm); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; border-color: var(--primary); color: var(--primary);">
+              View All ${productsInCat.length} ${catName} →
+            </button>
+          </div>
+        `;
+      }
     }
   });
   
