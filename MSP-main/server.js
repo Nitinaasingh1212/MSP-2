@@ -131,6 +131,16 @@ app.get('/product/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, 'product-details.html'));
 });
 
+// Serve Dynamic SEO Product Category page
+app.get('/products/:category', (req, res, next) => {
+  const allowedCategories = ['capsules', 'injections', 'syrups', 'tablets', 'veterinary'];
+  if (allowedCategories.includes(req.params.category.toLowerCase())) {
+    res.sendFile(path.join(__dirname, 'products.html'));
+  } else {
+    next();
+  }
+});
+
 // 301 Redirect Admin Pages with .html to Clean URLs
 app.get('/admin-control/:page.html', (req, res) => {
   res.redirect(301, `/admin-control/${req.params.page}`);
