@@ -329,9 +329,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         let images = [];
         if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-          images = product.images;
+          images = product.images.map(img => {
+            if (!img) return '';
+            return img.startsWith('http') || img.startsWith('/') ? img : `/assets/uploads/products/${img}`;
+          }).filter(Boolean);
         } else if (product.imageUrl) {
-          images = [product.imageUrl];
+          const img = product.imageUrl;
+          images = [img.startsWith('http') || img.startsWith('/') ? img : `/assets/uploads/products/${img}`];
         }
         
         window.activeImageIndex = 0;

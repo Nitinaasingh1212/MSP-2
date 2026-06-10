@@ -24,8 +24,8 @@
   <meta id="twitterDesc" name="twitter:description" content="Access details, active chemical compositions, and download medical brochures for our WHO-GMP approved formulations.">
   <meta id="twitterImage" name="twitter:image" content="https://mspharma.in/assets/logos/logo.png">
   
-  <link class="detail-css" rel="stylesheet" href="css/style.css">
-  <link class="detail-css" rel="stylesheet" href="css/responsive.css">
+  <link class="detail-css" rel="stylesheet" href="/css/style.css">
+  <link class="detail-css" rel="stylesheet" href="/css/responsive.css">
   
   <!-- Firebase SDK (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -37,8 +37,8 @@
   <!-- Sticky Header -->
   <header class="header scrolled" id="mainHeader">
     <div class="container nav-container">
-      <a href="index.html" class="logo-wrapper">
-        <img src="assets/logos/logo.png" alt="MSP Logo" class="logo-img">
+      <a href="/" class="logo-wrapper">
+        <img src="/assets/logos/logo.png" alt="MSP Logo" class="logo-img">
         <div class="logo-text">
           MAA SUKRITI PHARMACEUTICALS
           <span class="logo-tagline">Embrace Your Health</span>
@@ -47,15 +47,15 @@
       
       <nav>
         <ul class="nav-links" id="navLinks">
-          <li><a href="index.html" class="nav-link">Home</a></li>
-          <li><a href="about.html" class="nav-link">About Us</a></li>
-          <li><a href="products.html" class="nav-link">Products</a></li>
-          <li><a href="contact.html" class="nav-link">Contact Us</a></li>
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/about" class="nav-link">About Us</a></li>
+          <li><a href="/products" class="nav-link">Products</a></li>
+          <li><a href="/contact" class="nav-link">Contact Us</a></li>
         </ul>
       </nav>
       
       <div class="nav-actions">
-        <a href="cart.html" class="cart-icon-btn" id="cartBtn" title="View Enquiry Cart">
+        <a href="/cart" class="cart-icon-btn" id="cartBtn" title="View Enquiry Cart">
           <i data-lucide="shopping-cart"></i>
           <span class="cart-badge" id="cartBadge">0</span>
         </a>
@@ -71,9 +71,9 @@
     <div class="container">
       <h1 id="bannerTitle">Product Details</h1>
       <ul class="breadcrumb">
-        <li><a href="index.html">Home</a></li>
+        <li><a href="/">Home</a></li>
         <li class="breadcrumb-separator">/</li>
-        <li><a href="products.html">Products</a></li>
+        <li><a href="/products">Products</a></li>
         <li class="breadcrumb-separator">/</li>
         <li id="breadcrumbActive">Details</li>
       </ul>
@@ -195,20 +195,20 @@
       <div class="footer-col">
         <h4>Quick Links</h4>
         <ul class="footer-links">
-          <li class="footer-link"><a href="index.html">Home</a></li>
-          <li class="footer-link"><a href="about.html">About Us</a></li>
-          <li class="footer-link"><a href="products.html">Product Catalog</a></li>
-          <li class="footer-link"><a href="contact.html">Contact Us</a></li>
+          <li class="footer-link"><a href="/">Home</a></li>
+          <li class="footer-link"><a href="/about">About Us</a></li>
+          <li class="footer-link"><a href="/products">Product Catalog</a></li>
+          <li class="footer-link"><a href="/contact">Contact Us</a></li>
         </ul>
       </div>
       
       <div class="footer-col">
         <h4>Divisions</h4>
         <ul class="footer-links">
-          <li class="footer-link"><a href="products.html?cat=Tablets">Tablets</a></li>
-          <li class="footer-link"><a href="products.html?cat=Capsules">Capsules</a></li>
-          <li class="footer-link"><a href="products.html?cat=Syrups">Syrups</a></li>
-          <li class="footer-link"><a href="products.html?cat=Injections">Injections</a></li>
+          <li class="footer-link"><a href="/products?cat=Tablets">Tablets</a></li>
+          <li class="footer-link"><a href="/products?cat=Capsules">Capsules</a></li>
+          <li class="footer-link"><a href="/products?cat=Syrups">Syrups</a></li>
+          <li class="footer-link"><a href="/products?cat=Injections">Injections</a></li>
         </ul>
       </div>
       
@@ -430,9 +430,9 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <!-- Custom JS Scripts -->
-  <script src="js/firebase-config.js"></script>
-  <script src="js/cart.js"></script>
-  <script src="js/products.js"></script>
+  <script src="/js/firebase-config.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/products.js"></script>
   
   <script>
     // Tab switching
