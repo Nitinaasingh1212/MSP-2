@@ -95,6 +95,17 @@ app.get('/api/debug-paths', (req, res) => {
     debugInfo.logsError = e.message;
   }
 
+  // Test writing to public_html
+  try {
+    const testPublicPath = path.join(__dirname, '../../public_html/test_write.txt');
+    fs.writeFileSync(testPublicPath, 'Write test successful at ' + new Date().toISOString());
+    debugInfo.publicWriteResult = 'SUCCESS: Wrote to ' + testPublicPath;
+    debugInfo.publicReadBack = fs.readFileSync(testPublicPath, 'utf8');
+    fs.unlinkSync(testPublicPath);
+  } catch (err) {
+    debugInfo.publicWriteResult = 'FAILED: ' + err.message;
+  }
+
   res.json(debugInfo);
 });
 
