@@ -4,11 +4,24 @@
 function isValidImageUrl(url) {
   if (!url) return false;
   const clean = url.trim().toLowerCase();
+  
+  // Exclude empty folder paths
   if (clean === '/assets/uploads/products/' || clean === '/assets/uploads/products' || clean.endsWith('/')) return false;
   if (clean.includes('undefined') || clean.includes('null')) return false;
-  const hasImageExtension = clean.endsWith('.jpg') || clean.endsWith('.jpeg') || clean.endsWith('.png') || clean.endsWith('.gif') || clean.endsWith('.webp') || clean.endsWith('.svg');
-  const isWebOrDataUrl = clean.startsWith('http') || clean.startsWith('data:');
-  return hasImageExtension || isWebOrDataUrl;
+  
+  // Data URLs are always valid
+  if (clean.startsWith('data:')) return true;
+  
+  // Remove query parameters and hashes for extension checking
+  const pathname = clean.split('?')[0].split('#')[0];
+  
+  return pathname.endsWith('.jpg') || 
+         pathname.endsWith('.jpeg') || 
+         pathname.endsWith('.png') || 
+         pathname.endsWith('.gif') || 
+         pathname.endsWith('.webp') || 
+         pathname.endsWith('.svg') ||
+         pathname.endsWith('.bmp');
 }
 
 // Default Mock Data for local fallback (Demo Mode)

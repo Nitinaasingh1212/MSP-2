@@ -131,25 +131,11 @@
           </div>
         </div>
         
-        <!-- Tabbed Specs -->
-        <div class="details-tabs-wrapper" style="background-color: var(--white); border-radius: var(--radius-md); border: 1px solid var(--gray-light); box-shadow: var(--shadow-sm); overflow: hidden;">
-          <div class="tabs-nav" style="display: flex; border-bottom: 1px solid var(--gray-light); background-color: var(--light);">
-            <button class="tab-btn active" onclick="switchTab(event, 'tabDescription')" style="flex: 1; padding: 0.8rem; font-weight: 700; border: none; background: none; cursor: pointer; transition: var(--transition); border-bottom: 3px solid var(--primary); font-size: 0.9rem;">Description</button>
-            <button class="tab-btn" onclick="switchTab(event, 'tabIndications')" style="flex: 1; padding: 0.8rem; font-weight: 700; border: none; background: none; cursor: pointer; transition: var(--transition); border-bottom: 3px solid transparent; font-size: 0.9rem;">Clinical Use</button>
-            <button class="tab-btn" onclick="switchTab(event, 'tabDirections')" style="flex: 1; padding: 0.8rem; font-weight: 700; border: none; background: none; cursor: pointer; transition: var(--transition); border-bottom: 3px solid transparent; font-size: 0.9rem;">Directions</button>
-          </div>
-          <div class="tabs-content" style="padding: var(--spacing-md); min-height: 120px;">
-            <div id="tabDescription" class="tab-pane active" style="font-size: 0.95rem; color: var(--gray-dark);">
-              Product formulation descriptions go here...
-            </div>
-            <div id="tabIndications" class="tab-pane" style="display: none; font-size: 0.95rem; color: var(--gray-dark);">
-              Suitable for prescription-guided general medical usage. Follow licensing regulations for bulk distributions.
-            </div>
-            <div id="tabDirections" class="tab-pane" style="display: none; font-size: 0.95rem; color: var(--gray-dark); line-height: 1.6;">
-              <strong>Dosage:</strong> As directed by a registered medical practitioner.<br>
-              <strong>Storage:</strong> Store in a cool, dark, and dry place. Protect from heat, moisture, and direct sunlight. Keep the container tightly closed.<br>
-              <strong>Warnings:</strong> Schedule H Prescriptions warning applies. Not for direct retail sale without a license.
-            </div>
+        <!-- Product Description Block -->
+        <div class="details-description-wrapper" style="background-color: var(--white); border-radius: var(--radius-md); border: 1px solid var(--gray-light); box-shadow: var(--shadow-sm); overflow: hidden; padding: var(--spacing-md);">
+          <h4 style="font-size: 0.95rem; color: var(--primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1.5px solid var(--gray-light); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">Description</h4>
+          <div id="tabDescription" style="font-size: 0.95rem; color: var(--gray-dark); line-height: 1.6;">
+            Product formulation descriptions go here...
           </div>
         </div>
         

@@ -285,7 +285,20 @@ async function loadAdminProductsTable() {
     const statusBadge = p.status === "active" ? `<span class="badge badge-active">Active</span>` : `<span class="badge badge-hidden">Hidden</span>`;
     
     // image preview
-    const validImg = (p.imageUrl && p.imageUrl.trim() !== '' && !p.imageUrl.toLowerCase().endsWith('/') && !p.imageUrl.toLowerCase().includes('undefined') && !p.imageUrl.toLowerCase().includes('null')) ? p.imageUrl : '';
+    let validImg = '';
+    if (p.imageUrl && p.imageUrl.trim() !== '') {
+      const clean = p.imageUrl.trim().toLowerCase();
+      if (!clean.endsWith('/') && !clean.includes('undefined') && !clean.includes('null')) {
+        if (clean.startsWith('data:')) {
+          validImg = p.imageUrl;
+        } else {
+          const pathname = clean.split('?')[0].split('#')[0];
+          if (pathname.endsWith('.jpg') || pathname.endsWith('.jpeg') || pathname.endsWith('.png') || pathname.endsWith('.gif') || pathname.endsWith('.webp') || pathname.endsWith('.svg') || pathname.endsWith('.bmp')) {
+            validImg = p.imageUrl;
+          }
+        }
+      }
+    }
     const imageTd = validImg 
       ? `<img src="${validImg}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">` 
       : `<span style="font-size:1.5rem;">💊</span>`;
