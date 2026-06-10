@@ -328,10 +328,37 @@
     function previewFile(input, previewId) {
       const preview = document.getElementById(previewId);
       if (input.files && input.files[0]) {
-        preview.innerText = input.files[0].name;
-        preview.style.display = "block";
+        const file = input.files[0];
+        if (preview) {
+          preview.innerText = file.name;
+          preview.style.display = "block";
+        }
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const box = input.closest('.file-upload-box-mini') || input.closest('.file-upload-box');
+            if (box) {
+              box.style.backgroundImage = `url('${e.target.result}')`;
+              box.style.backgroundSize = 'cover';
+              box.style.backgroundPosition = 'center';
+              const svg = box.querySelector('svg, i');
+              const p = box.querySelector('p');
+              if (svg) svg.style.opacity = '0';
+              if (p) p.style.opacity = '0';
+            }
+          };
+          reader.readAsDataURL(file);
+        }
       } else {
-        preview.style.display = "none";
+        if (preview) preview.style.display = "none";
+        const box = input.closest('.file-upload-box-mini') || input.closest('.file-upload-box');
+        if (box) {
+          box.style.backgroundImage = 'none';
+          const svg = box.querySelector('svg, i');
+          const p = box.querySelector('p');
+          if (svg) svg.style.opacity = '1';
+          if (p) p.style.opacity = '1';
+        }
       }
     }
     

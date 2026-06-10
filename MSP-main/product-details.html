@@ -247,6 +247,19 @@
     <span id="toastMsg">Notification message</span>
   </div>
 
+  <!-- Lightbox Gallery Modal -->
+  <div class="modal" id="lightboxModal">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+      <button class="lightbox-prev" onclick="navigateLightbox(-1)">&#10094;</button>
+      <div class="lightbox-image-wrapper">
+        <img id="lightboxImage" src="" alt="Enlarged Formulation View">
+      </div>
+      <button class="lightbox-next" onclick="navigateLightbox(1)">&#10095;</button>
+      <div class="lightbox-thumbs" id="lightboxThumbs"></div>
+    </div>
+  </div>
+
   <style>
     /* Details styling custom rules */
     .tab-btn.active {
@@ -276,6 +289,139 @@
     @media (max-width: 768px) {
       #productDetailsWrapper {
         grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* Lightbox Modal Custom Style */
+    #lightboxModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .lightbox-content {
+      position: relative;
+      width: 90%;
+      max-width: 800px;
+      height: 80vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+    
+    .lightbox-image-wrapper {
+      width: 100%;
+      height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: transparent;
+      overflow: hidden;
+    }
+    
+    .lightbox-image-wrapper img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      transition: opacity 0.2s ease-in-out;
+    }
+    
+    .lightbox-close {
+      position: absolute;
+      top: -10px;
+      right: 0;
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 2.5rem;
+      cursor: pointer;
+      line-height: 1;
+      transition: var(--transition);
+      z-index: 2100;
+    }
+    .lightbox-close:hover {
+      color: var(--error);
+      transform: scale(1.1);
+    }
+    
+    .lightbox-prev, .lightbox-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--white);
+      font-size: 2rem;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      z-index: 2100;
+    }
+    .lightbox-prev:hover, .lightbox-next:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .lightbox-prev {
+      left: -60px;
+    }
+    .lightbox-next {
+      right: -60px;
+    }
+    
+    .lightbox-thumbs {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .lightbox-thumb {
+      width: 60px;
+      height: 60px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      cursor: pointer;
+      background-color: var(--white);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.6;
+    }
+    .lightbox-thumb:hover, .lightbox-thumb.active {
+      border-color: var(--primary);
+      transform: scale(1.05);
+      opacity: 1;
+    }
+    
+    @media (max-width: 992px) {
+      .lightbox-prev {
+        left: 10px;
+      }
+      .lightbox-next {
+        right: 10px;
+      }
+      .lightbox-close {
+        top: -40px;
+        right: 10px;
       }
     }
   </style>

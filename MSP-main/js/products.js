@@ -334,8 +334,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           images = [product.imageUrl];
         }
         
+        window.activeImageIndex = 0;
+        
         if (images.length > 0) {
           detailImg.src = images[0];
+          detailImg.style.cursor = "pointer";
+          detailImg.onclick = () => {
+            openLightbox(images, window.activeImageIndex);
+          };
           
           if (images.length > 1 && thumbContainer) {
             thumbContainer.innerHTML = "";
@@ -345,6 +351,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               thumb.className = "gallery-thumb" + (index === 0 ? " active" : "");
               thumb.innerHTML = `<img src="${imgUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
               thumb.onclick = () => {
+                window.activeImageIndex = index;
                 detailImg.style.opacity = "0.5";
                 setTimeout(() => {
                   detailImg.src = imgUrl;
@@ -362,6 +369,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         } else {
           detailImg.src = `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%23f1f5f9"/><text x="50" y="55" font-size="28" text-anchor="middle">💊</text></svg>`;
+          detailImg.style.cursor = "default";
+          detailImg.onclick = null;
           if (thumbContainer) thumbContainer.style.display = "none";
         }
         
@@ -395,14 +404,14 @@ function generateProductCardHTML(p) {
     
   return `
     <div class="product-card" id="card_${p.id}">
-      <div class="product-image-container">
+      <div class="product-image-container" style="cursor: pointer;" onclick="window.location.href='/product/${p.slug || p.id}'">
         <span class="product-tag">${p.category}</span>
         ${isFeaturedTag}
         ${imageTag}
       </div>
       <div class="product-content">
         <span class="product-category">${p.category}</span>
-        <h4 class="product-title">${p.name}</h4>
+        <h4 class="product-title" style="cursor: pointer;" onclick="window.location.href='/product/${p.slug || p.id}'">${p.name}</h4>
         <div class="product-composition" title="${p.composition}">${p.composition}</div>
         <p class="product-desc">${p.description}</p>
         
@@ -448,3 +457,116 @@ function sendDirectWhatsappEnquiry() {
   const encoded = encodeURIComponent(msg);
   window.open(`https://wa.me/919415021041?text=${encoded}`, '_blank');
 }
+
+// Lightbox Gallery Functions
+window.lightboxImages = [];
+window.lightboxActiveIndex = 0;
+
+function openLightbox(imagesList, startIndex = 0) {
+  const modal = document.getElementById("lightboxModal");
+  if (!modal) return;
+  
+  window.lightboxImages = imagesList;
+  window.lightboxActiveIndex = startIndex;
+  
+  // Render thumbnails inside the lightbox
+  const thumbsContainer = document.getElementById("lightboxThumbs");
+  if (thumbsContainer) {
+    thumbsContainer.innerHTML = "";
+    if (imagesList.length > 1) {
+      imagesList.forEach((imgUrl, idx) => {
+        const thumb = document.createElement("div");
+        thumb.className = "lightbox-thumb" + (idx === startIndex ? " active" : "");
+        thumb.innerHTML = `<img src="${imgUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
+        thumb.onclick = () => {
+          updateLightboxImage(idx);
+        };
+        thumbsContainer.appendChild(thumb);
+      });
+    }
+  }
+  
+  // Show / Hide navigation buttons if there's only 1 image
+  const prevBtn = document.querySelector(".lightbox-prev");
+  const nextBtn = document.querySelector(".lightbox-next");
+  if (prevBtn && nextBtn) {
+    if (imagesList.length <= 1) {
+      prevBtn.style.display = "none";
+      nextBtn.style.display = "none";
+    } else {
+      prevBtn.style.display = "flex";
+      nextBtn.style.display = "flex";
+    }
+  }
+  
+  updateLightboxImage(startIndex);
+  modal.style.display = "flex";
+}
+
+function updateLightboxImage(index) {
+  if (index < 0 || index >= window.lightboxImages.length) return;
+  window.lightboxActiveIndex = index;
+  
+  const imgElement = document.getElementById("lightboxImage");
+  if (imgElement) {
+    imgElement.style.opacity = "0.5";
+    setTimeout(() => {
+      imgElement.src = window.lightboxImages[index];
+      imgElement.style.opacity = "1";
+    }, 100);
+  }
+  
+  // Update active class on thumbs
+  document.querySelectorAll(".lightbox-thumb").forEach((t, idx) => {
+    if (idx === index) {
+      t.classList.add("active");
+    } else {
+      t.classList.remove("active");
+    }
+  });
+}
+
+function closeLightbox() {
+  const modal = document.getElementById("lightboxModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+function navigateLightbox(direction) {
+  if (window.lightboxImages.length <= 1) return;
+  let newIndex = window.lightboxActiveIndex + direction;
+  if (newIndex < 0) {
+    newIndex = window.lightboxImages.length - 1;
+  } else if (newIndex >= window.lightboxImages.length) {
+    newIndex = 0;
+  }
+  updateLightboxImage(newIndex);
+}
+
+// Expose functions globally for HTML inline onclick handlers
+window.closeLightbox = closeLightbox;
+window.navigateLightbox = navigateLightbox;
+window.openLightbox = openLightbox;
+
+// Close lightbox when clicking outside the image content
+window.addEventListener("click", (e) => {
+  const modal = document.getElementById("lightboxModal");
+  if (e.target === modal) {
+    closeLightbox();
+  }
+});
+
+// Close lightbox on Escape key, navigate on Arrow keys
+window.addEventListener("keydown", (e) => {
+  const modal = document.getElementById("lightboxModal");
+  if (modal && modal.style.display === "flex") {
+    if (e.key === "Escape") {
+      closeLightbox();
+    } else if (e.key === "ArrowLeft") {
+      navigateLightbox(-1);
+    } else if (e.key === "ArrowRight") {
+      navigateLightbox(1);
+    }
+  }
+});

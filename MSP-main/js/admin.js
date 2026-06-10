@@ -376,6 +376,15 @@ function openProductModal(mode, prodId = null) {
   const orderInput = document.getElementById("formDisplayOrder");
   if (orderInput) orderInput.value = "0";
 
+  // Reset mini upload boxes background style
+  document.querySelectorAll('.file-upload-box-mini').forEach(box => {
+    box.style.backgroundImage = 'none';
+    const svg = box.querySelector('svg');
+    const p = box.querySelector('p');
+    if (svg) svg.style.opacity = '1';
+    if (p) p.style.opacity = '1';
+  });
+
   activeExistingImages = [];
   renderActiveExistingImages();
   currentEditingProductId = null;
