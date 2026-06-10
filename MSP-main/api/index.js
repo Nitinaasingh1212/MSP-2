@@ -106,6 +106,14 @@ app.get('/api/debug-paths', (req, res) => {
     debugInfo.publicReadBack = fs.readFileSync(testFilePath, 'utf8');
     debugInfo.publicHtmlContentsAfter = fs.readdirSync(path.join(__dirname, '../../public_html'));
     
+    // Read live cloudinary.js content
+    const cloudinaryPath = path.join(__dirname, '../lib/cloudinary.js');
+    if (fs.existsSync(cloudinaryPath)) {
+      debugInfo.cloudinaryJs = fs.readFileSync(cloudinaryPath, 'utf8');
+    } else {
+      debugInfo.cloudinaryJs = 'Does not exist at ' + cloudinaryPath;
+    }
+    
     // Clean up
     fs.unlinkSync(testFilePath);
   } catch (err) {
