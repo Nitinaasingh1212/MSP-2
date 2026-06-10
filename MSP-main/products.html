@@ -90,35 +90,19 @@
 
   <!-- Catalog Section -->
   <section class="section">
-    <div class="container" style="display: grid; grid-template-columns: 280px 1fr; gap: var(--spacing-lg); align-items: start;" id="catalogGrid">
-      
-      <!-- Filter Sidebar (Responsive) -->
-      <aside class="sidebar-filters" id="sidebarFilters" style="background-color: var(--white); padding: var(--spacing-md); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--gray-light); position: sticky; top: 100px;">
-        
-        <!-- Search Group -->
-        <div style="margin-bottom: var(--spacing-md);">
-          <label class="form-label" for="searchInput">Search Product</label>
-          <div style="position: relative;">
-            <input type="text" id="searchInput" class="form-control" placeholder="Search by name, formula..." style="padding-left: 2.5rem;">
-            <i data-lucide="search" style="position: absolute; left: 10px; top: 10px; color: var(--gray-medium); width: 18px; height: 18px;"></i>
-          </div>
-        </div>
-        
-        <!-- Sorting -->
-        <div style="margin-bottom: var(--spacing-md);">
-          <label class="form-label" for="sortSelect">Sort By</label>
-          <select id="sortSelect" class="form-control">
-            <option value="name-asc">Alphabetical (A - Z)</option>
-            <option value="name-desc">Alphabetical (Z - A)</option>
-            <option value="newest">Newest Formulation</option>
-          </select>
-        </div>
-        
-        <button class="btn btn-outline btn-sm" id="resetFiltersBtn" style="width: 100%;">Reset Filters</button>
-      </aside>
+    <div class="container" id="catalogGrid" style="max-width: 1200px; margin: 0 auto;">
       
       <!-- Catalog Display Grid -->
-      <main class="catalog-main">
+      <main class="catalog-main" style="width: 100%;">
+        <!-- Search and Reset Row -->
+        <div class="search-header-row" style="display: flex; gap: 1rem; margin-bottom: var(--spacing-md); align-items: center; width: 100%;">
+          <div style="position: relative; flex: 1;">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search formulations by name, composition..." style="padding-left: 2.5rem; height: 46px; border-radius: var(--radius-md);">
+            <i data-lucide="search" style="position: absolute; left: 14px; top: 14px; color: var(--gray-medium); width: 18px; height: 18px;"></i>
+          </div>
+          <button class="btn btn-outline" id="resetFiltersBtn" style="height: 46px; white-space: nowrap; border-radius: var(--radius-md); font-weight: 700; padding: 0 1.5rem; font-size: 0.9rem;">Reset Filters</button>
+        </div>
+
         <!-- Horizontal Categories Filter Bar -->
         <div class="horizontal-categories-bar" style="border-bottom: 2px solid var(--gray-light); margin-bottom: var(--spacing-md); overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px;">
           <ul id="categoriesFilterList" style="list-style: none; display: flex; gap: 0.25rem; padding: 0; margin: 0; align-items: center; min-width: max-content;">
@@ -259,15 +243,8 @@
       box-shadow: var(--shadow-sm);
     }
     
-    /* Layout style tweaks for filter responsive layout */
-    @media (max-width: 992px) {
-      #catalogGrid {
-        grid-template-columns: 1fr !important;
-      }
-      #sidebarFilters {
-        position: static !important;
-        margin-bottom: var(--spacing-sm);
-      }
+    #catalogGrid {
+      display: block !important;
     }
   </style>
 
