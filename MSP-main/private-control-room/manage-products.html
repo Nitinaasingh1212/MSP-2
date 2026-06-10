@@ -33,6 +33,47 @@
       display: block;
       margin-bottom: 4px;
     }
+    .file-upload-box-mini {
+      border: 1.5px dashed var(--gray-medium);
+      border-radius: var(--radius-md);
+      padding: 0.5rem;
+      text-align: center;
+      background-color: var(--light);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80px;
+      position: relative;
+    }
+    .file-upload-box-mini:hover {
+      border-color: var(--primary);
+      background-color: var(--white);
+    }
+    .file-upload-box-mini svg {
+      margin-bottom: 2px;
+      color: var(--gray-medium);
+      width: 18px;
+      height: 18px;
+    }
+    .file-upload-box-mini p {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--gray-dark);
+      margin: 0;
+      line-height: 1.2;
+    }
+    .file-preview-mini {
+      font-size: 0.65rem;
+      color: var(--success-dark);
+      font-weight: 700;
+      margin-top: 4px;
+      word-break: break-all;
+      display: none;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -209,33 +250,48 @@
         </div>
 
         <!-- Image & PDF Brochure Upload Grid -->
-        <div class="form-group" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1rem;">
+        <div class="form-group" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1rem; align-items: end;">
           <div>
-            <label class="form-label">Product Images (Up to 3)</label>
+            <label class="form-label" style="margin-bottom: 0.5rem;">Product Images (Up to 3)</label>
             <div class="admin-image-upload-grid">
               <div class="file-upload-wrapper">
                 <span class="file-input-label">Image 1</span>
-                <input type="file" id="formImageFile1" accept="image/*" class="form-control" style="padding: 4px;" onchange="previewFile(this, 'imgPreview1')">
+                <div class="file-upload-box-mini">
+                  <i data-lucide="image"></i>
+                  <p>Click to Upload</p>
+                  <input type="file" id="formImageFile1" accept="image/*" class="file-upload-input" onchange="previewFile(this, 'imgPreview1')">
+                </div>
+                <div class="file-preview-mini" id="imgPreview1"></div>
               </div>
               <div class="file-upload-wrapper">
                 <span class="file-input-label">Image 2</span>
-                <input type="file" id="formImageFile2" accept="image/*" class="form-control" style="padding: 4px;" onchange="previewFile(this, 'imgPreview2')">
+                <div class="file-upload-box-mini">
+                  <i data-lucide="image"></i>
+                  <p>Click to Upload</p>
+                  <input type="file" id="formImageFile2" accept="image/*" class="file-upload-input" onchange="previewFile(this, 'imgPreview2')">
+                </div>
+                <div class="file-preview-mini" id="imgPreview2"></div>
               </div>
               <div class="file-upload-wrapper">
                 <span class="file-input-label">Image 3</span>
-                <input type="file" id="formImageFile3" accept="image/*" class="form-control" style="padding: 4px;" onchange="previewFile(this, 'imgPreview3')">
+                <div class="file-upload-box-mini">
+                  <i data-lucide="image"></i>
+                  <p>Click to Upload</p>
+                  <input type="file" id="formImageFile3" accept="image/*" class="file-upload-input" onchange="previewFile(this, 'imgPreview3')">
+                </div>
+                <div class="file-preview-mini" id="imgPreview3"></div>
               </div>
             </div>
           </div>
           <div>
-            <label class="form-label">Product Brochure (PDF)</label>
-            <div class="file-upload-wrapper">
-              <div class="file-upload-box" id="pdfUploadBox" style="padding: 1.1rem 0.5rem;">
-                <i data-lucide="file-text" style="width:24px; height:24px;"></i>
-                <p style="font-size:0.75rem; font-weight:600; color:var(--gray-dark);">Drag & Drop PDF or Click</p>
+            <label class="form-label" style="margin-bottom: 0.5rem;">Product Brochure (PDF)</label>
+            <div class="file-upload-wrapper" style="margin-top: 0;">
+              <div class="file-upload-box" id="pdfUploadBox" style="padding: 0.95rem 0.5rem; min-height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <i data-lucide="file-text" style="width:20px; height:20px; margin-bottom: 2px;"></i>
+                <p style="font-size:0.65rem; font-weight:600; color:var(--gray-dark); margin: 0; line-height: 1.2;">Drag & Drop PDF or Click</p>
                 <input type="file" id="formPdfFile" class="file-upload-input" accept="application/pdf" onchange="previewFile(this, 'pdfPreview')">
               </div>
-              <div class="file-preview" id="pdfPreview" style="margin-top: 4px; display: none;">No PDF selected</div>
+              <div class="file-preview-mini" id="pdfPreview"></div>
             </div>
           </div>
         </div>
