@@ -104,19 +104,6 @@
           </div>
         </div>
         
-        <!-- Categories List -->
-        <div style="margin-bottom: var(--spacing-md);">
-          <label class="form-label">Filter By Category</label>
-          <ul id="categoriesFilterList" style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto; padding-right: 5px;">
-            <li>
-              <button class="btn-category-filter active" data-category="all" style="width: 100%; text-align: left; background: none; border: none; padding: 0.5rem; font-weight: 600; cursor: pointer; border-radius: var(--radius-sm); font-size: 0.9rem; transition: var(--transition);">
-                All Categories
-              </button>
-            </li>
-            <!-- Dynamic Category List -->
-          </ul>
-        </div>
-        
         <!-- Sorting -->
         <div style="margin-bottom: var(--spacing-md);">
           <label class="form-label" for="sortSelect">Sort By</label>
@@ -132,6 +119,18 @@
       
       <!-- Catalog Display Grid -->
       <main class="catalog-main">
+        <!-- Horizontal Categories Filter Bar -->
+        <div class="horizontal-categories-bar" style="border-bottom: 2px solid var(--gray-light); margin-bottom: var(--spacing-md); overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px;">
+          <ul id="categoriesFilterList" style="list-style: none; display: flex; gap: 0.25rem; padding: 0; margin: 0; align-items: center; min-width: max-content;">
+            <li>
+              <button class="btn-category-filter active" data-category="all">
+                All Products
+              </button>
+            </li>
+            <!-- Dynamic Category List -->
+          </ul>
+        </div>
+
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
           <div style="font-size: 0.9rem; font-weight: 600; color: var(--gray-dark);">
             Showing <span id="displayedCount">0</span> of <span id="totalCount">0</span> Products
@@ -229,22 +228,34 @@
   </div>
 
   <style>
-    /* Styling overrides for active categories filter */
+    /* Styling overrides for active horizontal categories filter */
+    .horizontal-categories-bar::-webkit-scrollbar {
+      display: none;
+    }
+    .horizontal-categories-bar {
+      scrollbar-width: none;
+    }
     .btn-category-filter {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      padding: 0.6rem 0.8rem !important;
+      border: none;
+      background: none;
+      padding: 0.6rem 1.2rem !important;
+      font-size: 0.8rem !important;
+      font-weight: 700 !important;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       color: var(--gray-dark);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      white-space: nowrap;
     }
     .btn-category-filter:hover {
       color: var(--primary);
-      background-color: var(--light) !important;
+      background-color: #f1f5f9;
     }
     .btn-category-filter.active {
-      color: var(--white);
-      background-color: var(--primary) !important;
+      color: var(--white) !important;
+      background-color: #334155 !important; /* Premium dark slate background like the second pic */
       box-shadow: var(--shadow-sm);
     }
     
