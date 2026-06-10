@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
       query += ' WHERE status = ?';
       params.push('active');
     }
-    query += ' ORDER BY id DESC';
+    query += ' ORDER BY display_order ASC, name ASC, id ASC';
 
     const [rows] = await db.query(query, params);
     
@@ -38,6 +38,10 @@ module.exports = async (req, res) => {
       description: r.description,
       imageUrl: r.image_url ? (r.image_url.startsWith('http') || r.image_url.startsWith('/') ? r.image_url : `/assets/uploads/products/${r.image_url}`) : '',
       pdfUrl: r.pdf_url ? (r.pdf_url.startsWith('http') || r.pdf_url.startsWith('/') ? r.pdf_url : `/assets/uploads/pdfs/${r.pdf_url}`) : '',
+      slug: r.slug || '',
+      tags: r.tags || '',
+      displayOrder: r.display_order || 0,
+      images: typeof r.images === 'string' ? JSON.parse(r.images) : (r.images || []),
       createdAt: r.created_at
     }));
 

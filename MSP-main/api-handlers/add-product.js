@@ -5,6 +5,9 @@ const multer = require('multer');
 
 const upload = multer({ storage: multer.memoryStorage() }).fields([
   { name: 'imageFile', maxCount: 1 },
+  { name: 'imageFile1', maxCount: 1 },
+  { name: 'imageFile2', maxCount: 1 },
+  { name: 'imageFile3', maxCount: 1 },
   { name: 'pdfFile', maxCount: 1 }
 ]);
 
@@ -17,6 +20,14 @@ function runMiddleware(req, res, fn) {
       return resolve(result);
     });
   });
+}
+
+function makeSlug(name) {
+  return name.toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-');
 }
 
 module.exports = async (req, res) => {
@@ -39,7 +50,7 @@ module.exports = async (req, res) => {
   try {
     await runMiddleware(req, res, upload);
 
-    const { name, category, composition, packaging, featured, status, description } = req.body;
+    const { name, category, composition, packaging, featured, status, description, tags, displayOrder } = req.body;
 
     // Validate fields before uploading to Cloudinary
     if (!name || !name.trim()) {
@@ -63,23 +74,29 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Product description is required' });
     }
 
-    let imageUrl = '';
-    let pdfUrl = '';
-
-    // Upload image if present
-    if (req.files && req.files.imageFile && req.files.imageFile[0]) {
-      try {
-        const imgBuffer = req.files.imageFile[0].buffer;
-        imageUrl = await uploadToCloudinary(imgBuffer, { 
-          folder: 'products',
-          originalname: req.files.imageFile[0].originalname
-        });
-      } catch (uploadError) {
-        console.error('Image Upload Error:', uploadError);
-        return res.status(500).json({ error: `Image Upload failed: ${uploadError.message}` });
+    const images = [];
+    
+    // Process up to 3 image file uploads
+    const imageFilesKeys = ['imageFile', 'imageFile1', 'imageFile2', 'imageFile3'];
+    for (const key of imageFilesKeys) {
+      if (req.files && req.files[key] && req.files[key][0]) {
+        try {
+          const imgBuffer = req.files[key][0].buffer;
+          const relativeUrl = await uploadToCloudinary(imgBuffer, { 
+            folder: 'products',
+            originalname: req.files[key][0].originalname
+          });
+          if (relativeUrl && images.length < 3) {
+            images.push(relativeUrl);
+          }
+        } catch (uploadError) {
+          console.error(`Image upload error for ${key}:`, uploadError);
+          return res.status(500).json({ error: `Image Upload failed for ${key}: ${uploadError.message}` });
+        }
       }
     }
 
+    let pdfUrl = '';
     // Upload brochure if present
     if (req.files && req.files.pdfFile && req.files.pdfFile[0]) {
       try {
@@ -94,10 +111,28 @@ module.exports = async (req, res) => {
       }
     }
 
+    const mainImageUrl = images.length > 0 ? images[0] : '';
+    const display_order_val = parseInt(displayOrder) || 0;
+    const tags_val = tags ? tags.trim() : '';
+
+    // Auto-generate a unique slug
+    const baseSlug = makeSlug(name);
+    let slug = baseSlug;
+    let counter = 1;
+    while (true) {
+      const [existing] = await db.query('SELECT id FROM products WHERE slug = ?', [slug]);
+      if (existing.length === 0) break;
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+
     const [result] = await db.query(
-      `INSERT INTO products (name, category, composition, packaging, featured, status, description, image_url, pdf_url)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [name.trim(), category.trim(), composition.trim(), packaging.trim(), featured || 'false', status || 'active', description.trim(), imageUrl, pdfUrl]
+      `INSERT INTO products (name, category, composition, packaging, featured, status, description, image_url, pdf_url, slug, tags, display_order, images)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        name.trim(), category.trim(), composition.trim(), packaging.trim(), featured || 'false', status || 'active', description.trim(),
+        mainImageUrl, pdfUrl, slug, tags_val, display_order_val, JSON.stringify(images)
+      ]
     );
 
     return res.status(200).json({ success: true, id: result.insertId });

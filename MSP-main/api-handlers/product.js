@@ -14,13 +14,19 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { id } = req.query;
-  if (!id) {
-    return res.status(400).json({ error: 'Product ID is required' });
+  const { id, slug } = req.query;
+  if (!id && !slug) {
+    return res.status(400).json({ error: 'Product ID or Slug is required' });
   }
 
   try {
-    const [rows] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
+    let rows;
+    if (slug) {
+      [rows] = await db.query('SELECT * FROM products WHERE slug = ?', [slug]);
+    } else {
+      [rows] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
+    }
+
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Product not found' });
     }
@@ -37,6 +43,10 @@ module.exports = async (req, res) => {
       description: r.description,
       imageUrl: r.image_url ? (r.image_url.startsWith('http') || r.image_url.startsWith('/') ? r.image_url : `/assets/uploads/products/${r.image_url}`) : '',
       pdfUrl: r.pdf_url ? (r.pdf_url.startsWith('http') || r.pdf_url.startsWith('/') ? r.pdf_url : `/assets/uploads/pdfs/${r.pdf_url}`) : '',
+      slug: r.slug || '',
+      tags: r.tags || '',
+      displayOrder: r.display_order || 0,
+      images: typeof r.images === 'string' ? JSON.parse(r.images) : (r.images || []),
       createdAt: r.created_at
     };
 

@@ -5,6 +5,9 @@ const multer = require('multer');
 
 const upload = multer({ storage: multer.memoryStorage() }).fields([
   { name: 'imageFile', maxCount: 1 },
+  { name: 'imageFile1', maxCount: 1 },
+  { name: 'imageFile2', maxCount: 1 },
+  { name: 'imageFile3', maxCount: 1 },
   { name: 'pdfFile', maxCount: 1 }
 ]);
 
@@ -17,6 +20,14 @@ function runMiddleware(req, res, fn) {
       return resolve(result);
     });
   });
+}
+
+function makeSlug(name) {
+  return name.toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-');
 }
 
 module.exports = async (req, res) => {
@@ -39,7 +50,7 @@ module.exports = async (req, res) => {
   try {
     await runMiddleware(req, res, upload);
 
-    const { id, name, category, composition, packaging, featured, status, description } = req.body;
+    const { id, name, category, composition, packaging, featured, status, description, tags, displayOrder, existingImage1, existingImage2, existingImage3 } = req.body;
 
     // Validate fields before uploading to Cloudinary
     if (!id) {
@@ -67,29 +78,68 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Product description is required' });
     }
 
-    const [currentRows] = await db.query('SELECT image_url, pdf_url FROM products WHERE id = ?', [id]);
+    const [currentRows] = await db.query('SELECT name, slug, image_url, pdf_url, images FROM products WHERE id = ?', [id]);
     if (currentRows.length === 0) {
       console.error(`Validation Error: Product with ID ${id} not found in database`);
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    let imageUrl = currentRows[0].image_url;
-    let pdfUrl = currentRows[0].pdf_url;
+    // Process gallery images
+    const existingImages = [
+      existingImage1 || '',
+      existingImage2 || '',
+      existingImage3 || ''
+    ];
 
-    // Upload image if present
-    if (req.files && req.files.imageFile && req.files.imageFile[0]) {
+    let img1 = existingImages[0];
+    if (req.files && ((req.files.imageFile && req.files.imageFile[0]) || (req.files.imageFile1 && req.files.imageFile1[0]))) {
+      const file = (req.files.imageFile && req.files.imageFile[0]) || (req.files.imageFile1 && req.files.imageFile1[0]);
       try {
-        const imgBuffer = req.files.imageFile[0].buffer;
-        imageUrl = await uploadToCloudinary(imgBuffer, { 
+        const imgBuffer = file.buffer;
+        img1 = await uploadToCloudinary(imgBuffer, { 
           folder: 'products',
-          originalname: req.files.imageFile[0].originalname
+          originalname: file.originalname
         });
       } catch (uploadError) {
-        console.error('Image Upload Error in update API:', uploadError);
-        return res.status(500).json({ error: `Image Upload failed: ${uploadError.message}` });
+        console.error('Image upload error for slot 1:', uploadError);
+        return res.status(500).json({ error: `Image Upload failed for slot 1: ${uploadError.message}` });
       }
     }
 
+    let img2 = existingImages[1];
+    if (req.files && req.files.imageFile2 && req.files.imageFile2[0]) {
+      const file = req.files.imageFile2[0];
+      try {
+        const imgBuffer = file.buffer;
+        img2 = await uploadToCloudinary(imgBuffer, { 
+          folder: 'products',
+          originalname: file.originalname
+        });
+      } catch (uploadError) {
+        console.error('Image upload error for slot 2:', uploadError);
+        return res.status(500).json({ error: `Image Upload failed for slot 2: ${uploadError.message}` });
+      }
+    }
+
+    let img3 = existingImages[2];
+    if (req.files && req.files.imageFile3 && req.files.imageFile3[0]) {
+      const file = req.files.imageFile3[0];
+      try {
+        const imgBuffer = file.buffer;
+        img3 = await uploadToCloudinary(imgBuffer, { 
+          folder: 'products',
+          originalname: file.originalname
+        });
+      } catch (uploadError) {
+        console.error('Image upload error for slot 3:', uploadError);
+        return res.status(500).json({ error: `Image Upload failed for slot 3: ${uploadError.message}` });
+      }
+    }
+
+    const imagesList = [img1, img2, img3].filter(url => url && url.trim() !== '');
+    const imageUrl = imagesList.length > 0 ? imagesList[0] : '';
+
+    let pdfUrl = currentRows[0].pdf_url;
     // Upload brochure if present
     if (req.files && req.files.pdfFile && req.files.pdfFile[0]) {
       try {
@@ -104,11 +154,31 @@ module.exports = async (req, res) => {
       }
     }
 
+    // Update slug if product name changes
+    let slug = currentRows[0].slug;
+    if (name.trim() !== currentRows[0].name) {
+      const baseSlug = makeSlug(name);
+      slug = baseSlug;
+      let counter = 1;
+      while (true) {
+        const [existing] = await db.query('SELECT id FROM products WHERE slug = ? AND id != ?', [slug, id]);
+        if (existing.length === 0) break;
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+    }
+
+    const display_order_val = parseInt(displayOrder) || 0;
+    const tags_val = tags ? tags.trim() : '';
+
     await db.query(
       `UPDATE products 
-       SET name = ?, category = ?, composition = ?, packaging = ?, featured = ?, status = ?, description = ?, image_url = ?, pdf_url = ?
+       SET name = ?, category = ?, composition = ?, packaging = ?, featured = ?, status = ?, description = ?, image_url = ?, pdf_url = ?, slug = ?, tags = ?, display_order = ?, images = ?
        WHERE id = ?`,
-      [name.trim(), category.trim(), composition.trim(), packaging.trim(), featured || 'false', status || 'active', description.trim(), imageUrl, pdfUrl, id]
+      [
+        name.trim(), category.trim(), composition.trim(), packaging.trim(), featured || 'false', status || 'active', description.trim(),
+        imageUrl, pdfUrl, slug, tags_val, display_order_val, JSON.stringify(imagesList), id
+      ]
     );
 
     return res.status(200).json({ success: true });

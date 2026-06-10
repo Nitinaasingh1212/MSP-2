@@ -35,17 +35,99 @@ const pool = mysql.createPool(poolConfig);
 let initialized = false;
 let initPromise = null;
 
+function generateSlug(name) {
+  return name.toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '') // remove non-alphanumeric (except spaces and hyphens)
+    .replace(/[\s_]+/g, '-')   // replace spaces and underscores with hyphens
+    .replace(/-+/g, '-');      // remove duplicate hyphens
+}
+
 async function initDB() {
   if (initialized) return;
   if (!initPromise) {
     initPromise = (async () => {
-      // 0. Quick check to see if database is already initialized (saves 7+ queries)
+      // 0. Quick check to see if database tables exist. If they do, run schema check and migrations.
+      let tablesExist = false;
       try {
         await pool.query('SELECT 1 FROM products LIMIT 1');
-        initialized = true;
-        return;
+        tablesExist = true;
       } catch (err) {
         console.log('Database tables not found, running initialization/seeding...');
+      }
+
+      if (tablesExist) {
+        // Run column migrations & data upgrades on existing tables
+        try {
+          const [columns] = await pool.query('SHOW COLUMNS FROM products');
+          const columnNames = columns.map(c => c.Field);
+          
+          if (!columnNames.includes('slug')) {
+            console.log('Migration: Adding slug column to products table...');
+            await pool.query('ALTER TABLE products ADD COLUMN slug VARCHAR(255) UNIQUE');
+          }
+          if (!columnNames.includes('tags')) {
+            console.log('Migration: Adding tags column to products table...');
+            await pool.query('ALTER TABLE products ADD COLUMN tags VARCHAR(1000) DEFAULT ""');
+          }
+          if (!columnNames.includes('display_order')) {
+            console.log('Migration: Adding display_order column to products table...');
+            await pool.query('ALTER TABLE products ADD COLUMN display_order INT DEFAULT 0');
+          }
+          if (!columnNames.includes('images')) {
+            console.log('Migration: Adding images column to products table...');
+            await pool.query('ALTER TABLE products ADD COLUMN images JSON');
+          }
+
+          // Data migrations: update null/empty slugs, images, display_order
+          const [rows] = await pool.query('SELECT id, name, image_url, slug, display_order, images FROM products');
+          for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            let needsUpdate = false;
+            let updateSql = 'UPDATE products SET ';
+            let updateParams = [];
+            
+            if (!row.slug) {
+              const baseSlug = generateSlug(row.name);
+              // Make baseSlug unique
+              let uniqueSlug = baseSlug;
+              let counter = 1;
+              while (true) {
+                const [existing] = await pool.query('SELECT id FROM products WHERE slug = ? AND id != ?', [uniqueSlug, row.id]);
+                if (existing.length === 0) break;
+                uniqueSlug = `${baseSlug}-${counter}`;
+                counter++;
+              }
+              updateSql += 'slug = ?, ';
+              updateParams.push(uniqueSlug);
+              needsUpdate = true;
+            }
+            
+            if (row.display_order === null || row.display_order === 0) {
+              updateSql += 'display_order = ?, ';
+              updateParams.push(i + 1);
+              needsUpdate = true;
+            }
+            
+            if (!row.images) {
+              const defaultImagesArray = row.image_url ? [row.image_url] : [];
+              updateSql += 'images = ?, ';
+              updateParams.push(JSON.stringify(defaultImagesArray));
+              needsUpdate = true;
+            }
+            
+            if (needsUpdate) {
+              updateSql = updateSql.slice(0, -2) + ' WHERE id = ?';
+              updateParams.push(row.id);
+              await pool.query(updateSql, updateParams);
+            }
+          }
+          console.log('Database schema and data migrations completed successfully.');
+        } catch (migrationErr) {
+          console.error('Failed to run database migrations:', migrationErr);
+        }
+        initialized = true;
+        return;
       }
 
       const conn = await pool.getConnection();
@@ -73,6 +155,10 @@ async function initDB() {
             description TEXT NOT NULL,
             image_url TEXT NOT NULL,
             pdf_url TEXT,
+            slug VARCHAR(255) UNIQUE,
+            tags VARCHAR(1000) DEFAULT '',
+            display_order INT DEFAULT 0,
+            images JSON,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
           )
         `);
@@ -227,11 +313,17 @@ async function initDB() {
             }
           ];
 
-          for (const p of defaultProds) {
+          for (let i = 0; i < defaultProds.length; i++) {
+            const p = defaultProds[i];
+            const baseSlug = generateSlug(p.name);
+            const defaultImagesArray = p.imageUrl ? [p.imageUrl] : [];
             await conn.query(
-              `INSERT INTO products (name, category, composition, packaging, featured, status, description, image_url, pdf_url)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-              [p.name, p.category, p.composition, p.packaging, p.featured, p.status, p.description, p.imageUrl, p.pdfUrl]
+              `INSERT INTO products (name, category, composition, packaging, featured, status, description, image_url, pdf_url, slug, tags, display_order, images)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              [
+                p.name, p.category, p.composition, p.packaging, p.featured, p.status, p.description, p.imageUrl, p.pdfUrl,
+                baseSlug, '', i + 1, JSON.stringify(defaultImagesArray)
+              ]
             );
           }
           console.log('Seeded default products.');

@@ -192,10 +192,11 @@ async function fetchFeaturedProducts() {
   return allProds.filter(p => p.featured === true || p.featured === "true");
 }
 
-// Get Single Product by ID
-async function fetchProductById(id) {
+// Get Single Product by ID or Slug
+async function fetchProductById(idOrSlug, isSlug = false) {
   try {
-    const res = await fetch(`/api/product?id=${id}`, {
+    const param = isSlug ? `slug=${idOrSlug}` : `id=${idOrSlug}`;
+    const res = await fetch(`/api/product?${param}`, {
       cache: 'no-store',
       headers: {
         'Pragma': 'no-cache',
@@ -207,7 +208,10 @@ async function fetchProductById(id) {
   } catch (e) {
     console.error("Get product detail API error: ", e);
     const all = getLocalProducts();
-    return all.find(p => p.id === id);
+    if (isSlug) {
+      return all.find(p => p.slug === idOrSlug || makeSlug(p.name) === idOrSlug);
+    }
+    return all.find(p => p.id === idOrSlug);
   }
 }
 
@@ -215,9 +219,9 @@ async function fetchProductById(id) {
 document.addEventListener("DOMContentLoaded", async () => {
   // Page check
   const path = window.location.pathname;
-  const isIndex = path.includes("index.html") || path.endsWith("/");
-  const isProducts = path.includes("products.html");
-  const isDetails = path.includes("product-details.html");
+  const isIndex = path === '/' || path.endsWith('/index') || path.includes('index.html') || path === '';
+  const isProducts = path.includes('/products') || path.includes('products.html');
+  const isDetails = path.includes('/product/') || path.includes('product-details.html');
   
   // 1. HOME PAGE RENDERING
   if (isIndex) {
@@ -238,11 +242,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   
   // 2. PRODUCT DETAILS RENDERING
   if (isDetails) {
-    const params = new URLSearchParams(window.location.search);
-    const prodId = params.get("id");
-    if (prodId) {
-      const product = await fetchProductById(prodId);
+    let idOrSlug = null;
+    let isSlug = false;
+    
+    if (path.includes('/product/')) {
+      idOrSlug = path.split('/product/').pop().split('/').shift();
+      isSlug = true;
+    } else {
+      const params = new URLSearchParams(window.location.search);
+      idOrSlug = params.get("id");
+      isSlug = false;
+    }
+    
+    if (idOrSlug) {
+      const product = await fetchProductById(idOrSlug, isSlug);
       if (product) {
+        window.currentProductId = product.id;
         document.getElementById("bannerTitle").innerText = product.name;
         document.getElementById("breadcrumbActive").innerText = product.name;
         document.getElementById("detailName").innerText = product.name;
@@ -257,6 +272,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         const metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) {
           metaDesc.setAttribute("content", `${product.name} (${product.composition}) - WHO-GMP certified formulation from Maa Sukriti Pharmaceuticals. Packaging: ${product.packaging}. ${product.description}`);
+        }
+
+        // Update keywords meta tag for SEO
+        const metaKeywords = document.querySelector('meta[name="keywords"]');
+        if (metaKeywords && product.tags) {
+          metaKeywords.setAttribute("content", product.tags + ", " + metaKeywords.getAttribute("content"));
         }
         
         // Dynamic Open Graph updates
@@ -304,11 +325,44 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         // Image setup
         const detailImg = document.getElementById("detailImage");
-        if (product.imageUrl) {
-          detailImg.src = product.imageUrl;
+        const thumbContainer = document.getElementById("galleryThumbnailsContainer");
+        
+        let images = [];
+        if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+          images = product.images;
+        } else if (product.imageUrl) {
+          images = [product.imageUrl];
+        }
+        
+        if (images.length > 0) {
+          detailImg.src = images[0];
+          
+          if (images.length > 1 && thumbContainer) {
+            thumbContainer.innerHTML = "";
+            thumbContainer.style.display = "flex";
+            images.forEach((imgUrl, index) => {
+              const thumb = document.createElement("div");
+              thumb.className = "gallery-thumb" + (index === 0 ? " active" : "");
+              thumb.innerHTML = `<img src="${imgUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
+              thumb.onclick = () => {
+                detailImg.style.opacity = "0.5";
+                setTimeout(() => {
+                  detailImg.src = imgUrl;
+                  detailImg.style.opacity = "1";
+                }, 150);
+                
+                // update active class
+                document.querySelectorAll(".gallery-thumb").forEach(t => t.classList.remove("active"));
+                thumb.classList.add("active");
+              };
+              thumbContainer.appendChild(thumb);
+            });
+          } else if (thumbContainer) {
+            thumbContainer.style.display = "none";
+          }
         } else {
-          // Default SVG icon placeholder matching category
           detailImg.src = `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%23f1f5f9"/><text x="50" y="55" font-size="28" text-anchor="middle">💊</text></svg>`;
+          if (thumbContainer) thumbContainer.style.display = "none";
         }
         
         // Brochure Setup
@@ -321,10 +375,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           pdfContainer.style.display = "none";
         }
       } else {
-        document.getElementById("productDetailsWrapper").innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:4rem;"><h3>Product not found!</h3><br><a href="products.html" class="btn btn-primary">Return to Catalog</a></div>`;
+        document.getElementById("productDetailsWrapper").innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:4rem;"><h3>Product not found!</h3><br><a href="/products" class="btn btn-primary">Return to Catalog</a></div>`;
       }
     } else {
-      window.location.href = "products.html";
+      window.location.href = "/products";
     }
   }
 });
@@ -353,7 +407,7 @@ function generateProductCardHTML(p) {
         <p class="product-desc">${p.description}</p>
         
         <div class="product-footer">
-          <a href="product-details.html?id=${p.id}" class="btn btn-outline btn-sm">Details</a>
+          <a href="/product/${p.slug || p.id}" class="btn btn-outline btn-sm">Details</a>
           <button class="btn btn-primary btn-sm" onclick="addToEnquiryCartDirect('${p.id}', '${p.name.replace(/'/g, "\\'")}', '${p.category}')">
             <i data-lucide="shopping-cart"></i> Add
           </button>
@@ -371,10 +425,15 @@ function addToEnquiryCartDirect(id, name, category) {
 
 function addProductToEnquiryCart() {
   const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
+  const id = window.currentProductId || params.get("id");
   const name = document.getElementById("detailName").innerText;
   const category = document.getElementById("detailCategory").innerText;
   const qty = parseInt(document.getElementById("detailQty").value) || 10;
+  
+  if (!id) {
+    showToastNotification("Could not identify product.", "alert-triangle", "toast-error");
+    return;
+  }
   
   addToCart(id, name, category, qty);
   showToastNotification(`Added ${qty} packs of ${name} to Enquiry Cart.`, "check-circle", "toast-success");

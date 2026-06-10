@@ -19,37 +19,132 @@ app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use('/js', express.static(path.join(__dirname, 'js')));
 
-// Serve Root Level Pages
-const pages = [
-  { route: '/', file: 'index.html' },
-  { route: '/index.html', file: 'index.html' },
-  { route: '/products.html', file: 'products.html' },
-  { route: '/product-details.html', file: 'product-details.html' },
-  { route: '/cart.html', file: 'cart.html' },
-  { route: '/about.html', file: 'about.html' },
-  { route: '/contact.html', file: 'contact.html' },
-  { route: '/robots.txt', file: 'robots.txt' },
-  { route: '/sitemap.xml', file: 'sitemap.xml' }
+// 301 Redirect Legacy Pages to Clean URLs
+app.get('/index.html', (req, res) => res.redirect(301, '/'));
+app.get('/products.html', (req, res) => res.redirect(301, '/products'));
+app.get('/about.html', (req, res) => res.redirect(301, '/about'));
+app.get('/contact.html', (req, res) => res.redirect(301, '/contact'));
+app.get('/cart.html', (req, res) => res.redirect(301, '/cart'));
+
+// 301 Redirect Legacy Product Details to SEO Slug URLs
+app.get(['/product-details.html', '/product-details'], async (req, res) => {
+  const { id } = req.query;
+  if (id) {
+    try {
+      const db = require('./lib/db');
+      const [rows] = await db.query('SELECT slug FROM products WHERE id = ?', [id]);
+      if (rows.length > 0 && rows[0].slug) {
+        return res.redirect(301, `/product/${rows[0].slug}`);
+      }
+    } catch (err) {
+      console.error('Redirect query error:', err);
+    }
+  }
+  res.redirect(301, '/products');
+});
+
+// 301 Redirect Legacy Admin Panel Routes to New hidden admin route
+app.get('/private-control-room', (req, res) => {
+  res.redirect(301, '/admin-control');
+});
+app.get('/private-control-room/:page*', (req, res) => {
+  const page = req.params.page || '';
+  const rest = req.params[0] || '';
+  res.redirect(301, `/admin-control/${page}${rest}`);
+});
+
+// Serve Root Level Clean URLs
+const cleanPages = [
+  { routes: ['/', '/index'], file: 'index.html' },
+  { routes: ['/products'], file: 'products.html' },
+  { routes: ['/about'], file: 'about.html' },
+  { routes: ['/contact'], file: 'contact.html' },
+  { routes: ['/cart'], file: 'cart.html' },
+  { routes: ['/robots.txt'], file: 'robots.txt' }
 ];
 
-pages.forEach(p => {
-  app.get(p.route, (req, res) => {
-    res.sendFile(path.join(__dirname, p.file));
+cleanPages.forEach(p => {
+  p.routes.forEach(r => {
+    app.get(r, (req, res) => {
+      res.sendFile(path.join(__dirname, p.file));
+    });
   });
 });
 
-// Serve Admin Pages
+// Dynamic XML Sitemap Generator Route
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const db = require('./lib/db');
+    const [rows] = await db.query('SELECT slug FROM products WHERE status = ?', ['active']);
+    
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://mspharma.in/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://mspharma.in/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mspharma.in/products</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mspharma.in/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mspharma.in/cart</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>`;
+
+    rows.forEach(p => {
+      if (p.slug) {
+        xml += `
+  <url>
+    <loc>https://mspharma.in/product/${p.slug}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+      }
+    });
+
+    xml += `\n</urlset>`;
+    
+    res.header('Content-Type', 'application/xml');
+    return res.status(200).send(xml);
+  } catch (err) {
+    console.error('Error generating dynamic sitemap:', err);
+    return res.status(500).send('Internal Server Error');
+  }
+});
+
+// Serve Dynamic SEO Product Details page
+app.get('/product/:slug', (req, res) => {
+  res.sendFile(path.join(__dirname, 'product-details.html'));
+});
+
+// Serve Admin Pages (Dual-support: clean route and relative extension resolution)
 const adminPages = [
-  { route: '/private-control-room/login.html', file: 'private-control-room/login.html' },
-  { route: '/private-control-room/dashboard.html', file: 'private-control-room/dashboard.html' },
-  { route: '/private-control-room/manage-products.html', file: 'private-control-room/manage-products.html' },
-  { route: '/private-control-room/categories.html', file: 'private-control-room/categories.html' },
-  { route: '/private-control-room/enquiries.html', file: 'private-control-room/enquiries.html' }
+  { routes: ['/admin-control', '/admin-control/', '/admin-control/dashboard', '/admin-control/dashboard.html'], file: 'private-control-room/dashboard.html' },
+  { routes: ['/admin-control/login', '/admin-control/login.html'], file: 'private-control-room/login.html' },
+  { routes: ['/admin-control/manage-products', '/admin-control/manage-products.html'], file: 'private-control-room/manage-products.html' },
+  { routes: ['/admin-control/categories', '/admin-control/categories.html'], file: 'private-control-room/categories.html' },
+  { routes: ['/admin-control/enquiries', '/admin-control/enquiries.html'], file: 'private-control-room/enquiries.html' }
 ];
 
 adminPages.forEach(p => {
-  app.get(p.route, (req, res) => {
-    res.sendFile(path.join(__dirname, p.file));
+  p.routes.forEach(r => {
+    app.get(r, (req, res) => {
+      res.sendFile(path.join(__dirname, p.file));
+    });
   });
 });
 

@@ -87,8 +87,11 @@
       <!-- Left: Image & Brochure Download -->
       <div class="details-media-col" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
         <div style="background-color: var(--white); border-radius: var(--radius-lg); padding: var(--spacing-md); border: 1px solid var(--gray-light); box-shadow: var(--shadow-sm); overflow: hidden; display: flex; align-items: center; justify-content: center; height: 350px;">
-          <img id="detailImage" src="" alt="Product Formulation" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+          <img id="detailImage" src="" alt="Product Formulation" style="max-height: 100%; max-width: 100%; object-fit: contain; transition: opacity 0.3s ease;">
         </div>
+        
+        <!-- Gallery Thumbnails -->
+        <div id="galleryThumbnailsContainer" style="display: none; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin-top: -0.25rem;"></div>
         
         <!-- PDF Brochure Container -->
         <div id="pdfDownloadContainer" style="display: none; background: var(--secondary-light); border-radius: var(--radius-md); padding: var(--spacing-md); display: flex; align-items: center; justify-content: space-between; border: 1.5px dashed var(--secondary);">
@@ -250,6 +253,24 @@
       color: var(--primary) !important;
       border-bottom-color: var(--primary) !important;
       background-color: var(--white) !important;
+    }
+    
+    .gallery-thumb {
+      width: 60px;
+      height: 60px;
+      border: 2px solid var(--gray-light);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      cursor: pointer;
+      background-color: var(--white);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gallery-thumb:hover, .gallery-thumb.active {
+      border-color: var(--primary);
+      transform: scale(1.05);
     }
     
     @media (max-width: 768px) {

@@ -31,6 +31,7 @@ app.delete('/api/categories', require('../api-handlers/categories'));
 app.post('/api/login', require('../api-handlers/login'));
 app.post('/api/logout', require('../api-handlers/logout'));
 app.get('/api/check-auth', require('../api-handlers/check-auth'));
+app.get('/api/import-products', require('../api-handlers/import-products'));
 
 app.get('/api/debug-paths', (req, res) => {
   const fs = require('fs');

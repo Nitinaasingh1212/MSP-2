@@ -67,9 +67,14 @@
           <h2 style="font-size: 1.75rem;">Manage Formulations</h2>
           <p style="font-size: 0.9rem; color: var(--gray-dark);">Add, edit, hide, or delete catalogue formulations.</p>
         </div>
-        <button onclick="openProductModal('add')" class="btn btn-primary" style="display:flex; align-items:center; gap:6px;">
-          <i data-lucide="plus-circle"></i> Add New Product
-        </button>
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+          <button onclick="triggerProductsImport()" class="btn btn-outline" style="display:flex; align-items:center; gap:6px; border-color: var(--secondary); color: var(--secondary);">
+            <i data-lucide="refresh-cw"></i> Import WooCommerce Products
+          </button>
+          <button onclick="openProductModal('add')" class="btn btn-primary" style="display:flex; align-items:center; gap:6px;">
+            <i data-lucide="plus-circle"></i> Add New Product
+          </button>
+        </div>
       </div>
       
       <!-- Filters bar for quick navigation in list -->
@@ -96,6 +101,8 @@
                 <th>Product Name</th>
                 <th>Division / Category</th>
                 <th>Composition</th>
+                <th>Tags</th>
+                <th>Display Order</th>
                 <th>Featured</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -103,7 +110,7 @@
             </thead>
             <tbody id="adminProductsTableBody">
               <tr>
-                <td colspan="7" style="text-align: center; color: var(--gray-dark);">Loading products table...</td>
+                <td colspan="9" style="text-align: center; color: var(--gray-dark);">Loading products table...</td>
               </tr>
             </tbody>
           </table>
@@ -158,33 +165,65 @@
           </div>
         </div>
         
+        <div class="form-group" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1rem;">
+          <div>
+            <label class="form-label" for="formTags">Tags (comma-separated)</label>
+            <input type="text" id="formTags" class="form-control" placeholder="e.g. painkiller, fever, tablet, gmp">
+          </div>
+          <div>
+            <label class="form-label" for="formDisplayOrder">Display Order</label>
+            <input type="number" id="formDisplayOrder" class="form-control" placeholder="e.g. 1" value="0">
+          </div>
+        </div>
+
         <div class="form-group">
           <label class="form-label" for="formDescription">Description *</label>
           <textarea id="formDescription" class="form-control" placeholder="Provide description, indications, clinical dosing etc." required></textarea>
         </div>
         
+        <!-- Active gallery thumbnails for editing -->
+        <div id="existingImagesContainer" style="display: none; margin-bottom: 1rem; border: 1px solid var(--gray-light); padding: 0.75rem; border-radius: var(--radius-md); background-color: #f8fafc;">
+          <label class="form-label" style="font-weight: 700; display: block; margin-bottom: 0.5rem;">Active Gallery Images</label>
+          <div id="existingImagesList" style="display: flex; gap: 1rem; flex-wrap: wrap;"></div>
+        </div>
+
         <!-- Image & PDF Brochure Upload Grid -->
-        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1rem;">
           <div>
-            <label class="form-label">Product Image</label>
-            <div class="file-upload-wrapper">
-              <div class="file-upload-box" id="imageUploadBox">
-                <i data-lucide="image" style="width:24px; height:24px;"></i>
-                <p style="font-size:0.8rem; font-weight:600; color:var(--gray-dark);">Drag & Drop Image or Click</p>
-                <input type="file" id="formImageFile" class="file-upload-input" accept="image/*" onchange="previewFile(this, 'imgPreview')">
+            <label class="form-label">Product Images (Up to 3)</label>
+            <div style="display: flex; gap: 0.5rem; flex-direction: column;">
+              <div class="file-upload-wrapper" style="margin-bottom:0.25rem;">
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <span style="font-size: 0.85rem; font-weight: 600; min-width: 60px; color: var(--gray-dark);">Image 1:</span>
+                  <input type="file" id="formImageFile1" accept="image/*" class="form-control" style="padding: 4px;" onchange="previewFile(this, 'imgPreview1')">
+                </div>
+                <div class="file-preview" id="imgPreview1" style="margin-top: 2px; font-size: 0.8rem; display: none;">No image selected</div>
               </div>
-              <div class="file-preview" id="imgPreview">No image selected</div>
+              <div class="file-upload-wrapper" style="margin-bottom:0.25rem;">
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <span style="font-size: 0.85rem; font-weight: 600; min-width: 60px; color: var(--gray-dark);">Image 2:</span>
+                  <input type="file" id="formImageFile2" accept="image/*" class="form-control" style="padding: 4px;" onchange="previewFile(this, 'imgPreview2')">
+                </div>
+                <div class="file-preview" id="imgPreview2" style="margin-top: 2px; font-size: 0.8rem; display: none;">No image selected</div>
+              </div>
+              <div class="file-upload-wrapper">
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <span style="font-size: 0.85rem; font-weight: 600; min-width: 60px; color: var(--gray-dark);">Image 3:</span>
+                  <input type="file" id="formImageFile3" accept="image/*" class="form-control" style="padding: 4px;" onchange="previewFile(this, 'imgPreview3')">
+                </div>
+                <div class="file-preview" id="imgPreview3" style="margin-top: 2px; font-size: 0.8rem; display: none;">No image selected</div>
+              </div>
             </div>
           </div>
           <div>
             <label class="form-label">Product Brochure (PDF)</label>
             <div class="file-upload-wrapper">
-              <div class="file-upload-box" id="pdfUploadBox">
+              <div class="file-upload-box" id="pdfUploadBox" style="padding: 1rem 0.5rem;">
                 <i data-lucide="file-text" style="width:24px; height:24px;"></i>
-                <p style="font-size:0.8rem; font-weight:600; color:var(--gray-dark);">Drag & Drop PDF or Click</p>
+                <p style="font-size:0.75rem; font-weight:600; color:var(--gray-dark);">Drag & Drop PDF or Click</p>
                 <input type="file" id="formPdfFile" class="file-upload-input" accept="application/pdf" onchange="previewFile(this, 'pdfPreview')">
               </div>
-              <div class="file-preview" id="pdfPreview">No PDF selected</div>
+              <div class="file-preview" id="pdfPreview" style="margin-top: 4px; display: none;">No PDF selected</div>
             </div>
           </div>
         </div>

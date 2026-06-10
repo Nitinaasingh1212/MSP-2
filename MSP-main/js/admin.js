@@ -275,7 +275,7 @@ async function loadAdminProductsTable() {
   });
   
   if (filtered.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--gray-dark);">No products matched the current filters.</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:var(--gray-dark);">No products matched the current filters.</td></tr>`;
     return;
   }
   
@@ -295,6 +295,8 @@ async function loadAdminProductsTable() {
         <td><div style="font-weight:700;">${p.name}</div></td>
         <td><span style="font-weight:600; color:var(--secondary);">${p.category}</span></td>
         <td style="font-family:monospace; font-size:0.85rem;">${p.composition}</td>
+        <td><span style="font-size:0.85rem; color:var(--gray-dark);">${p.tags || '-'}</span></td>
+        <td><span style="font-weight:600;">${p.displayOrder || 0}</span></td>
         <td>${isFeatured}</td>
         <td>${statusBadge}</td>
         <td>
@@ -314,14 +316,68 @@ async function loadAdminProductsTable() {
   lucide.createIcons();
 }
 
+let activeExistingImages = [];
+
+function renderActiveExistingImages() {
+  const container = document.getElementById("existingImagesContainer");
+  const list = document.getElementById("existingImagesList");
+  if (!container || !list) return;
+  
+  if (activeExistingImages.length === 0) {
+    container.style.display = "none";
+    list.innerHTML = "";
+    return;
+  }
+  
+  container.style.display = "block";
+  list.innerHTML = "";
+  activeExistingImages.forEach((img, idx) => {
+    list.innerHTML += `
+      <div class="existing-image-thumb" style="position: relative; width: 60px; height: 60px; border: 1px solid var(--gray-medium); border-radius: 4px; overflow: hidden; background-color: white;">
+        <img src="${img}" style="width: 100%; height: 100%; object-fit: cover;">
+        <button type="button" onclick="removeExistingImage(${idx})" style="position: absolute; top: 0; right: 0; background: rgba(239, 68, 68, 0.8); color: white; border: none; cursor: pointer; padding: 2px 5px; font-size: 0.75rem; border-bottom-left-radius: 4px; line-height: 1;">&times;</button>
+      </div>
+    `;
+  });
+}
+
+function removeExistingImage(index) {
+  activeExistingImages.splice(index, 1);
+  renderActiveExistingImages();
+}
+
 function openProductModal(mode, prodId = null) {
   const modal = document.getElementById("productModal");
   const form = document.getElementById("productForm");
   const title = document.getElementById("modalTitle");
   
   form.reset();
-  document.getElementById("imgPreview").style.display = "none";
-  document.getElementById("pdfPreview").style.display = "none";
+  
+  // Clear file input previews
+  const previews = ["imgPreview1", "imgPreview2", "imgPreview3", "pdfPreview"];
+  previews.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = "none";
+      el.innerText = "";
+    }
+  });
+
+  const files = ["formImageFile1", "formImageFile2", "formImageFile3", "formPdfFile"];
+  files.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+
+  // Clear tags and order
+  const tagsInput = document.getElementById("formTags");
+  if (tagsInput) tagsInput.value = "";
+  
+  const orderInput = document.getElementById("formDisplayOrder");
+  if (orderInput) orderInput.value = "0";
+
+  activeExistingImages = [];
+  renderActiveExistingImages();
   currentEditingProductId = null;
   
   if (mode === "add") {
@@ -343,15 +399,18 @@ function openProductModal(mode, prodId = null) {
         document.getElementById("formStatus").checked = (p.status === "active");
         document.getElementById("formDescription").value = p.description;
         
-        if (p.imageUrl) {
-          const imgP = document.getElementById("imgPreview");
-          imgP.innerText = "Current Image active";
-          imgP.style.display = "block";
-        }
+        if (tagsInput) tagsInput.value = p.tags || "";
+        if (orderInput) orderInput.value = p.displayOrder || 0;
+        
+        activeExistingImages = p.images || (p.imageUrl ? [p.imageUrl] : []);
+        renderActiveExistingImages();
+
         if (p.pdfUrl) {
           const pdfP = document.getElementById("pdfPreview");
-          pdfP.innerText = "Current PDF Brochure active";
-          pdfP.style.display = "block";
+          if (pdfP) {
+            pdfP.innerText = "Current PDF Brochure active";
+            pdfP.style.display = "block";
+          }
         }
       }
     });
@@ -377,8 +436,13 @@ async function saveProduct(event) {
   const status = active ? "active" : "hidden";
   const description = document.getElementById("formDescription").value.trim();
   
-  const imageFile = document.getElementById("formImageFile").files[0];
-  const pdfFile = document.getElementById("formPdfFile").files[0];
+  const tags = document.getElementById("formTags")?.value.trim() || "";
+  const displayOrder = document.getElementById("formDisplayOrder")?.value || "0";
+
+  const imageFile1 = document.getElementById("formImageFile1")?.files[0];
+  const imageFile2 = document.getElementById("formImageFile2")?.files[0];
+  const imageFile3 = document.getElementById("formImageFile3")?.files[0];
+  const pdfFile = document.getElementById("formPdfFile")?.files[0];
 
   // Client-side Validation BEFORE uploading files to Cloudinary
   if (!name) {
@@ -416,13 +480,18 @@ async function saveProduct(event) {
   formData.append("featured", featured ? "true" : "false");
   formData.append("status", status);
   formData.append("description", description);
+  formData.append("tags", tags);
+  formData.append("displayOrder", displayOrder);
+
+  // Send references to active existing images
+  formData.append("existingImage1", activeExistingImages[0] || "");
+  formData.append("existingImage2", activeExistingImages[1] || "");
+  formData.append("existingImage3", activeExistingImages[2] || "");
   
-  if (imageFile) {
-    formData.append("imageFile", imageFile);
-  }
-  if (pdfFile) {
-    formData.append("pdfFile", pdfFile);
-  }
+  if (imageFile1) formData.append("imageFile1", imageFile1);
+  if (imageFile2) formData.append("imageFile2", imageFile2);
+  if (imageFile3) formData.append("imageFile3", imageFile3);
+  if (pdfFile) formData.append("pdfFile", pdfFile);
 
   let dbSuccess = false;
   let isDemoMode = false;
@@ -452,16 +521,22 @@ async function saveProduct(event) {
   if (!dbSuccess && isDemoMode) {
     // Local storage mock updates fallback
     const local = getLocalProducts();
-    let imageUrl = "";
+    
+    // Construct new images array from existing and uploaded files
+    let images = [...activeExistingImages];
+    if (imageFile1) images[0] = URL.createObjectURL(imageFile1);
+    if (imageFile2) images[1] = URL.createObjectURL(imageFile2);
+    if (imageFile3) images[2] = URL.createObjectURL(imageFile3);
+    images = images.filter(Boolean);
+
+    let imageUrl = images.length > 0 ? images[0] : "";
     let pdfUrl = "";
     if (id) {
       const existing = local.find(p => p.id === id);
       if (existing) {
-        imageUrl = existing.imageUrl || "";
         pdfUrl = existing.pdfUrl || "";
       }
     }
-    if (imageFile) imageUrl = URL.createObjectURL(imageFile);
     if (pdfFile) pdfUrl = URL.createObjectURL(pdfFile);
 
     const newProductDoc = {
@@ -474,6 +549,9 @@ async function saveProduct(event) {
       description,
       imageUrl,
       pdfUrl,
+      tags,
+      displayOrder: parseInt(displayOrder) || 0,
+      images,
       createdAt: new Date().toISOString()
     };
 
@@ -879,6 +957,12 @@ async function deleteEnquiry(enqId) {
   }
   
   loadAdminEnquiriesTable();
+}
+
+function triggerProductsImport() {
+  if (confirm("Are you sure you want to scrape and import products from mspbharat.com? This may take up to a minute, and will overwrite details/images for any products with duplicate names.")) {
+    window.open("/api/import-products", "_blank");
+  }
 }
 
 // Global router initialization for page actions
