@@ -15,6 +15,11 @@ app.use(cookieParser());
 app.use(require('./api/index'));
 
 // Serve Static Directories
+const persistentUploadsDir = '/home/u413027252/domains/mspharma.in/uploads';
+const fs = require('fs');
+if (fs.existsSync(persistentUploadsDir)) {
+  app.use('/assets/uploads', express.static(persistentUploadsDir));
+}
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use('/js', express.static(path.join(__dirname, 'js')));

@@ -13,47 +13,44 @@ function uploadToCloudinary(fileBuffer, options = {}) {
       // Generate unique name
       const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
       let writtenSuccessfully = false;
+      const isOnServer = __dirname.includes('/home/u413027252') || fs.existsSync('/home/u413027252/domains/mspharma.in');
+      let uploadDir;
 
-      // 1. Write to local app directory (for development / server fallback)
+      if (isOnServer) {
+        // Use external persistent directory on Hostinger server
+        uploadDir = path.join(__dirname, '../../uploads', folderName);
+      } else {
+        // Local fallback for local development
+        uploadDir = path.join(__dirname, '../assets/uploads', folderName);
+      }
+
+      // Ensure directory exists and write file
       try {
-        const localUploadDir = path.join(__dirname, '../assets/uploads', folderName);
-        if (!fs.existsSync(localUploadDir)) {
-          fs.mkdirSync(localUploadDir, { recursive: true });
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
         }
-        const localFilePath = path.join(localUploadDir, filename);
-        fs.writeFileSync(localFilePath, fileBuffer);
+        const filePath = path.join(uploadDir, filename);
+        fs.writeFileSync(filePath, fileBuffer);
         writtenSuccessfully = true;
-      } catch (localWriteErr) {
-        console.error('Failed to write to local app directory (trying public mirrors next):', localWriteErr);
+      } catch (writeErr) {
+        console.error(`Failed to write uploaded file to target directory (${uploadDir}):`, writeErr);
       }
 
-      // 2. Mirror to public web directories if they exist (for Hostinger LiteSpeed static serving)
-      const possiblePublicDirs = [
-        path.join(__dirname, '../../../../public_html'), // nodejs/MSP-main/lib -> mspharma.in/public_html
-        path.join(__dirname, '../../../public_html'),
-        path.join(__dirname, '../../public_html'),
-        path.join(__dirname, '../public_html'),
-        path.join(__dirname, '../../public'),
-        path.join(__dirname, '../public')
-      ];
-
-      for (const publicDir of possiblePublicDirs) {
-        if (fs.existsSync(publicDir)) {
-          const publicUploadDir = path.join(publicDir, 'assets/uploads', folderName);
-          try {
-            if (!fs.existsSync(publicUploadDir)) {
-              fs.mkdirSync(publicUploadDir, { recursive: true });
-            }
-            const publicFilePath = path.join(publicUploadDir, filename);
-            fs.writeFileSync(publicFilePath, fileBuffer);
-            writtenSuccessfully = true;
-          } catch (mirrorErr) {
-            console.error(`Failed to mirror uploaded file to public path (${publicUploadDir}):`, mirrorErr);
+      // Mirror write to the other directory just for double safety if we are on server
+      if (isOnServer) {
+        const localUploadDir = path.join(__dirname, '../assets/uploads', folderName);
+        try {
+          if (!fs.existsSync(localUploadDir)) {
+            fs.mkdirSync(localUploadDir, { recursive: true });
           }
+          const localFilePath = path.join(localUploadDir, filename);
+          fs.writeFileSync(localFilePath, fileBuffer);
+        } catch (localWriteErr) {
+          // Ignore failure to write to the volatile local app folder, as long as the persistent write succeeded
         }
       }
 
-      // If both write attempts failed (e.g. complete write permission restriction)
+      // If write attempts failed (e.g. complete write permission restriction)
       if (!writtenSuccessfully) {
         throw new Error('Permission Denied: Server filesystem is read-only or doesn\'t permit writing to assets directories.');
       }
