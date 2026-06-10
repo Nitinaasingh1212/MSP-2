@@ -446,6 +446,73 @@ function closeProductModal() {
   document.getElementById("productModal").style.display = "none";
 }
 
+// Client-Side Image Auto-Compression helper using Canvas
+function compressImageFile(file, maxWidth = 1000, maxHeight = 1000, quality = 0.7) {
+  return new Promise((resolve) => {
+    if (!file || !file.type.startsWith('image/')) {
+      resolve(file);
+      return;
+    }
+    
+    // Skip compression if already under 200KB
+    if (file.size <= 200 * 1024) {
+      resolve(file);
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const img = new Image();
+      img.onload = function() {
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const originalName = file.name;
+            const cleanName = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
+            const compressedFile = new File([blob], `${cleanName}.jpg`, {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            });
+            const savedPct = Math.round((1 - compressedFile.size / file.size) * 100);
+            console.log(`[Auto-Compress] ${file.name}: ${(file.size / 1024).toFixed(1)}KB -> ${(compressedFile.size / 1024).toFixed(1)}KB (${savedPct}% saved)`);
+            resolve(compressedFile);
+          } else {
+            resolve(file);
+          }
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = function() {
+        resolve(file);
+      };
+      img.src = event.target.result;
+    };
+    reader.onerror = function() {
+      resolve(file);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 async function saveProduct(event) {
   event.preventDefault();
   
@@ -467,7 +534,7 @@ async function saveProduct(event) {
   const imageFile3 = document.getElementById("formImageFile3")?.files[0];
   const pdfFile = document.getElementById("formPdfFile")?.files[0];
 
-  // Client-side Validation BEFORE uploading files to Cloudinary
+  // Client-side Validation BEFORE uploading files
   if (!name) {
     showToastNotification("Product Name is required.", "alert-triangle", "toast-error");
     return;
@@ -493,6 +560,30 @@ async function saveProduct(event) {
   btn.disabled = true;
   btn.innerText = "Saving Formulation...";
   
+  // Compress images in parallel before saving
+  let compressedImg1 = imageFile1;
+  let compressedImg2 = imageFile2;
+  let compressedImg3 = imageFile3;
+  
+  try {
+    if (imageFile1 && imageFile1.size > 200 * 1024) {
+      btn.innerText = "Compressing Image 1...";
+      compressedImg1 = await compressImageFile(imageFile1);
+    }
+    if (imageFile2 && imageFile2.size > 200 * 1024) {
+      btn.innerText = "Compressing Image 2...";
+      compressedImg2 = await compressImageFile(imageFile2);
+    }
+    if (imageFile3 && imageFile3.size > 200 * 1024) {
+      btn.innerText = "Compressing Image 3...";
+      compressedImg3 = await compressImageFile(imageFile3);
+    }
+  } catch (compressErr) {
+    console.warn("Client compression failed, using original images:", compressErr);
+  }
+  
+  btn.innerText = "Saving Formulation...";
+  
   // 1. Build FormData
   const formData = new FormData();
   if (id) formData.append("id", id);
@@ -511,9 +602,9 @@ async function saveProduct(event) {
   formData.append("existingImage2", activeExistingImages[1] || "");
   formData.append("existingImage3", activeExistingImages[2] || "");
   
-  if (imageFile1) formData.append("imageFile1", imageFile1);
-  if (imageFile2) formData.append("imageFile2", imageFile2);
-  if (imageFile3) formData.append("imageFile3", imageFile3);
+  if (compressedImg1) formData.append("imageFile1", compressedImg1);
+  if (compressedImg2) formData.append("imageFile2", compressedImg2);
+  if (compressedImg3) formData.append("imageFile3", compressedImg3);
   if (pdfFile) formData.append("pdfFile", pdfFile);
 
   let dbSuccess = false;
@@ -533,11 +624,10 @@ async function saveProduct(event) {
       const errData = await res.json().catch(() => ({}));
       const errMsg = errData.error || "Save failed";
       showToastNotification(errMsg, "alert-triangle", "toast-error");
-      isDemoMode = false; // Real API responded with an error, do not write to local storage
+      isDemoMode = false;
     }
   } catch (error) {
     console.error("Save product API error:", error);
-    // Network / server connection error suggests we might be running in offline demo mode
     isDemoMode = true;
   }
 
@@ -547,9 +637,9 @@ async function saveProduct(event) {
     
     // Construct new images array from existing and uploaded files
     let images = [...activeExistingImages];
-    if (imageFile1) images[0] = URL.createObjectURL(imageFile1);
-    if (imageFile2) images[1] = URL.createObjectURL(imageFile2);
-    if (imageFile3) images[2] = URL.createObjectURL(imageFile3);
+    if (compressedImg1) images[0] = URL.createObjectURL(compressedImg1);
+    if (compressedImg2) images[1] = URL.createObjectURL(compressedImg2);
+    if (compressedImg3) images[2] = URL.createObjectURL(compressedImg3);
     images = images.filter(Boolean);
 
     let imageUrl = images.length > 0 ? images[0] : "";
