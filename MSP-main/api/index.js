@@ -98,6 +98,43 @@ app.get('/api/debug-paths', (req, res) => {
   res.json(debugInfo);
 });
 
+app.get('/api/debug-find-files', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  
+  const searchRoot = '/home/u413027252/domains/mspharma.in';
+  const found = [];
+  
+  function scan(dir) {
+    try {
+      const items = fs.readdirSync(dir);
+      for (const item of items) {
+        const full = path.join(dir, item);
+        try {
+          const stat = fs.statSync(full);
+          if (stat.isDirectory()) {
+            // Avoid recursion into node_modules
+            if (item !== 'node_modules' && item !== '.git') {
+              scan(full);
+            }
+          } else {
+            if (item.includes('1781107658474') || item.includes('1781107957266') || item.includes('1781107658475')) {
+              found.push({
+                name: item,
+                path: full,
+                size: stat.size
+              });
+            }
+          }
+        } catch(e) {}
+      }
+    } catch(e) {}
+  }
+  
+  scan(searchRoot);
+  res.json({ searchRoot, found });
+});
+
 module.exports = app;
 module.exports.config = {
   api: {
