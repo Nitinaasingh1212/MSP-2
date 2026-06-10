@@ -1,5 +1,16 @@
 // Maa Sukriti Pharmaceuticals - Products & Categories Logic
 
+// Helper to validate if an image URL is correct and has a filename
+function isValidImageUrl(url) {
+  if (!url) return false;
+  const clean = url.trim().toLowerCase();
+  if (clean === '/assets/uploads/products/' || clean === '/assets/uploads/products' || clean.endsWith('/')) return false;
+  if (clean.includes('undefined') || clean.includes('null')) return false;
+  const hasImageExtension = clean.endsWith('.jpg') || clean.endsWith('.jpeg') || clean.endsWith('.png') || clean.endsWith('.gif') || clean.endsWith('.webp') || clean.endsWith('.svg');
+  const isWebOrDataUrl = clean.startsWith('http') || clean.startsWith('data:');
+  return hasImageExtension || isWebOrDataUrl;
+}
+
 // Default Mock Data for local fallback (Demo Mode)
 const DEFAULT_MOCK_CATEGORIES = [
   { id: "cat_1", name: "Tablets", status: "active" },
@@ -380,11 +391,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (product.images && Array.isArray(product.images) && product.images.length > 0) {
           images = product.images.map(img => {
             if (!img) return '';
-            return img.startsWith('http') || img.startsWith('/') ? img : `/assets/uploads/products/${img}`;
+            const fullUrl = img.startsWith('http') || img.startsWith('/') ? img : `/assets/uploads/products/${img}`;
+            return isValidImageUrl(fullUrl) ? fullUrl : '';
           }).filter(Boolean);
         } else if (product.imageUrl) {
           const img = product.imageUrl;
-          images = [img.startsWith('http') || img.startsWith('/') ? img : `/assets/uploads/products/${img}`];
+          const fullUrl = img.startsWith('http') || img.startsWith('/') ? img : `/assets/uploads/products/${img}`;
+          if (isValidImageUrl(fullUrl)) {
+            images = [fullUrl];
+          }
         }
         
         window.activeImageIndex = 0;
@@ -447,8 +462,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Card HTML Generator Helper
 function generateProductCardHTML(p) {
-  const imageTag = p.imageUrl 
-    ? `<img src="${p.imageUrl}" alt="${p.name}">` 
+  const validImage = isValidImageUrl(p.imageUrl) ? p.imageUrl : '';
+  const imageTag = validImage 
+    ? `<img src="${validImage}" alt="${p.name}">` 
     : `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:50%; height:50%; margin:auto;"><rect width="100%" height="100%" fill="none"/><text x="50" y="55" font-size="36" text-anchor="middle">💊</text></svg>`;
   
   const isFeaturedTag = (p.featured === true || p.featured === "true") 

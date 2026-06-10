@@ -285,8 +285,9 @@ async function loadAdminProductsTable() {
     const statusBadge = p.status === "active" ? `<span class="badge badge-active">Active</span>` : `<span class="badge badge-hidden">Hidden</span>`;
     
     // image preview
-    const imageTd = p.imageUrl 
-      ? `<img src="${p.imageUrl}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">` 
+    const validImg = (p.imageUrl && p.imageUrl.trim() !== '' && !p.imageUrl.toLowerCase().endsWith('/') && !p.imageUrl.toLowerCase().includes('undefined') && !p.imageUrl.toLowerCase().includes('null')) ? p.imageUrl : '';
+    const imageTd = validImg 
+      ? `<img src="${validImg}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">` 
       : `<span style="font-size:1.5rem;">💊</span>`;
       
     tableBody.innerHTML += `
