@@ -306,9 +306,10 @@ function applyFiltersAndRender() {
     }
   }
   
-  // Check if we are on mobile (under 768px) and browsing "All Products"
+  // Check if we are on mobile (under 768px)
   const isMobile = window.innerWidth <= 768;
-  const showSummaryView = isMobile && activeCategory === "all";
+  // Disable summary view on products catalog page so "All Products" (show all) displays all items
+  const showSummaryView = false;
   
   let html = "";
   let totalDisplayed = 0;
