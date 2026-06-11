@@ -355,7 +355,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("tabDescription").innerText = product.description;
         
         // Dynamically update document title & meta tags for SEO
-        document.title = `${product.name} | Maa Sukriti Pharmaceuticals`;
+        document.title = "Maa Sukriti Pharmaceuticals";
         
         const metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) {

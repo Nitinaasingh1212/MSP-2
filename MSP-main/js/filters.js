@@ -11,7 +11,7 @@ let allCatalogProducts = [];
 // Helper to update page titles, meta tags, and breadcrumbs for category pages
 function updateSEOHeaders(categoryName) {
   if (categoryName === "All Categories" || categoryName === "all") {
-    document.title = "Pharmaceutical Products List & Catalog | Maa Sukriti Pharmaceuticals";
+    document.title = "Maa Sukriti Pharmaceuticals";
     const descEl = document.querySelector('meta[name="description"]');
     if (descEl) {
       descEl.setAttribute("content", "Search and browse through our complete product list of pharmaceutical formulations. Filter by division (tablets, capsules, syrups, injections) or active chemical composition.");
@@ -33,7 +33,7 @@ function updateSEOHeaders(categoryName) {
       `;
     }
   } else {
-    document.title = `${categoryName} Formulations | Maa Sukriti Pharmaceuticals`;
+    document.title = "Maa Sukriti Pharmaceuticals";
     const descEl = document.querySelector('meta[name="description"]');
     if (descEl) {
       descEl.setAttribute("content", `Explore our complete list of WHO-GMP approved ${categoryName.toLowerCase()} formulations. Detailed composition, packaging specifications, and quick quotation details from Maa Sukriti Pharmaceuticals.`);
