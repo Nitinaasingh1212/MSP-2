@@ -332,8 +332,9 @@ function applyFiltersAndRender() {
   
   // Check if we are on mobile (under 768px)
   const isMobile = window.innerWidth <= 768;
-  // Enable mobile summary view only on "All Products" filter
-  const showSummaryView = isMobile && activeCategory === "all";
+  // Enable summary view on "All Products" filter for all devices
+  const showSummaryView = activeCategory === "all";
+  const initialLimit = isMobile ? 2 : 3;
   
   let html = "";
   let totalDisplayed = 0;
@@ -363,8 +364,8 @@ function applyFiltersAndRender() {
       `;
       
       const isExpanded = expandedCategories.has(catName.toLowerCase());
-      // If mobile summary view and not expanded, show only first 2 products (fits 2-column mobile layout perfectly)
-      const productsToDisplay = (showSummaryView && !isExpanded) ? productsInCat.slice(0, 2) : productsInCat;
+      // If summary view and not expanded, show only initialLimit products (2 on mobile, 3 on desktop)
+      const productsToDisplay = (showSummaryView && !isExpanded) ? productsInCat.slice(0, initialLimit) : productsInCat;
       
       // Render cards
       productsToDisplay.forEach(p => {
@@ -372,8 +373,8 @@ function applyFiltersAndRender() {
         totalDisplayed++;
       });
       
-      // Add "View All" or "Show Less" inline toggle button if category has more than 2 products
-      if (showSummaryView && productsInCat.length > 2) {
+      // Add "View All" or "Show Less" inline toggle button if category has more than initialLimit products
+      if (showSummaryView && productsInCat.length > initialLimit) {
         if (!isExpanded) {
           html += `
             <div class="catalog-view-all-wrapper" style="grid-column: 1 / -1; text-align: center; margin: 1rem 0 2rem 0; width: 100%;">
