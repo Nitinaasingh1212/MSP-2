@@ -390,7 +390,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             // Add redirect to full catalog category page (renders on both mobile and desktop)
             html += `
-              <div style="grid-column: 1 / -1; text-align: center; margin: 1rem 0 2rem 0; width: 100%;">
+              <div class="homepage-view-all-wrapper" style="grid-column: 1 / -1; text-align: center; margin: 1rem 0 2rem 0; width: 100%;">
                 <button onclick="window.location.href='/products/${makeCategorySlug(catName)}'" class="btn btn-outline" style="width: 100%; max-width: 320px; font-weight: 700; padding: 0.6rem var(--spacing-sm); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; border-color: var(--primary); color: var(--primary);">
                   View All ${catName} →
                 </button>
@@ -580,8 +580,6 @@ function generateProductCardHTML(p) {
   return `
     <div class="product-card" id="card_${p.id}">
       <div class="product-image-container" style="cursor: pointer;" onclick="window.location.href='/product/${p.slug || p.id}'">
-        <span class="product-tag">${p.category}</span>
-        ${isFeaturedTag}
         ${imageTag}
       </div>
       <div class="product-content">

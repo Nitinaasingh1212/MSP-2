@@ -186,6 +186,10 @@
     grid-template-columns: 1fr !important;
     gap: var(--spacing-md) !important;
   }
+  
+  .homepage-view-all-wrapper {
+    display: none !important;
+  }
 }
 
 @media (max-width: 576px) {
