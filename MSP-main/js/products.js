@@ -264,15 +264,34 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (name.includes("syrup")) return "🍷";
           if (name.includes("injection")) return "💉";
           if (name.includes("ayurvedic") || name.includes("herbal")) return "🌿";
-          if (name.includes("veterinary") || name.includes("animal")) return "🐾";
+          if (name.includes("veterinary") || name.includes("vetenary") || name.includes("animal")) return "🐾";
+          if (name.includes("bandage")) return "🩹";
+          if (name.includes("surgical tape")) return "🩹";
+          if (name.includes("vitamin") || name.includes("supplement")) return "💊";
+          if (name.includes("nasal") || name.includes("drop")) return "💧";
+          if (name.includes("eye") || name.includes("ophthalmology")) return "👁️";
+          if (name.includes("gynecology") || name.includes("hormonal")) return "🤰";
+          if (name.includes("instrument")) return "🩺";
+          if (name.includes("oncology") || name.includes("cytotoxic")) return "🔬";
+          if (name.includes("orthopedics") || name.includes("musculoskeletal") || name.includes("bone")) return "🦴";
+          if (name.includes("psychiatry") || name.includes("neurology") || name.includes("brain")) return "🧠";
           return "📦"; // Default
         }
         
         // Filter out inactive categories
         const activeCats = categories.filter(c => c.status === "active" || c.status === true || c.status === "true");
         
-        // Define sorting order for homepage divisions
-        const HOME_CATEGORY_ORDER = ["Tablets", "Capsules", "Syrups", "Injections", "Ayurvedic"];
+        // Define sorting order for homepage divisions to prioritize top 6-8 categories
+        const HOME_CATEGORY_ORDER = [
+          "Tablets", 
+          "Capsules", 
+          "Syrups", 
+          "Injections", 
+          "Ayurvedic", 
+          "Vitamins / Supplements", 
+          "Surgical Tapes", 
+          "Bandages"
+        ];
         
         activeCats.sort((a, b) => {
           const indexA = HOME_CATEGORY_ORDER.findIndex(cat => cat.toLowerCase() === a.name.toLowerCase());
@@ -282,7 +301,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           return valA - valB;
         });
 
-        activeCats.forEach(cat => {
+        // Limit to top 6 categories for a professional, compact layout
+        const catsToDisplay = activeCats.slice(0, 6);
+
+        catsToDisplay.forEach(cat => {
           const emoji = getCategoryEmoji(cat.name);
           homepageCategories.innerHTML += `
             <div class="category-card" onclick="window.location.href='/products/${cat.name.toLowerCase()}'">

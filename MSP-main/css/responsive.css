@@ -190,7 +190,26 @@
 
 @media (max-width: 576px) {
   .highlights-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+  
+  .highlights-container .highlight-card {
+    padding: 0.75rem !important;
+  }
+  
+  .highlights-container .highlight-number {
+    font-size: 1.5rem !important;
+  }
+  
+  .highlights-container .highlight-label {
+    font-size: 0.8rem !important;
+  }
+  
+  .highlights-container .highlight-icon {
+    width: 40px !important;
+    height: 40px !important;
+    margin-bottom: 0.35rem !important;
   }
   
   .footer-grid {
