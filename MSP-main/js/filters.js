@@ -7,6 +7,7 @@ let currentPage = 1;
 const productsPerPage = 9;
 
 let allCatalogProducts = [];
+let expandedCategories = new Set();
 
 // Helper to generate a clean URL-friendly category slug
 function makeCategorySlug(name) {
@@ -102,6 +103,7 @@ async function initCatalog() {
         
         activeCategory = e.target.getAttribute("data-category");
         currentPage = 1; // reset page
+        expandedCategories.clear(); // Clear inline expansions on filter change
         
         // Update URL path using history.pushState for smooth UX and SEO URLs
         if (activeCategory === "all") {
@@ -176,6 +178,7 @@ async function initCatalog() {
       activeSort = "name-asc";
       searchQuery = "";
       currentPage = 1;
+      expandedCategories.clear(); // Clear inline expansions on reset
       
       const searchInput = document.getElementById("searchInput");
       if (searchInput) searchInput.value = "";
@@ -246,6 +249,7 @@ function getFilteredProducts() {
 window.filterByCategoryDirect = function(catName) {
   activeCategory = catName;
   currentPage = 1;
+  expandedCategories.clear();
   
   // Mark the top category filter button active
   document.querySelectorAll(".btn-category-filter").forEach(btn => {
@@ -268,6 +272,17 @@ window.filterByCategoryDirect = function(catName) {
   if (scrollTarget) {
     scrollTarget.scrollIntoView({ behavior: "smooth" });
   }
+};
+
+// Inline category expansion handlers for mobile summary view
+window.expandCategoryInline = function(catName) {
+  expandedCategories.add(catName.toLowerCase());
+  applyFiltersAndRender();
+};
+
+window.collapseCategoryInline = function(catName) {
+  expandedCategories.delete(catName.toLowerCase());
+  applyFiltersAndRender();
 };
 
 // Core filter, sort, and paginate compiler
@@ -317,8 +332,8 @@ function applyFiltersAndRender() {
   
   // Check if we are on mobile (under 768px)
   const isMobile = window.innerWidth <= 768;
-  // Disable summary view on products catalog page so "All Products" (show all) displays all items
-  const showSummaryView = false;
+  // Enable mobile summary view only on "All Products" filter
+  const showSummaryView = isMobile && activeCategory === "all";
   
   let html = "";
   let totalDisplayed = 0;
@@ -347,8 +362,9 @@ function applyFiltersAndRender() {
         </div>
       `;
       
-      // If mobile summary view, show only the first product of the category
-      const productsToDisplay = showSummaryView ? productsInCat.slice(0, 1) : productsInCat;
+      const isExpanded = expandedCategories.has(catName.toLowerCase());
+      // If mobile summary view and not expanded, show only first 2 products (fits 2-column mobile layout perfectly)
+      const productsToDisplay = (showSummaryView && !isExpanded) ? productsInCat.slice(0, 2) : productsInCat;
       
       // Render cards
       productsToDisplay.forEach(p => {
@@ -356,15 +372,25 @@ function applyFiltersAndRender() {
         totalDisplayed++;
       });
       
-      // Add "View All" link button if we truncated products in this category
-      if (showSummaryView && productsInCat.length > 1) {
-        html += `
-          <div style="grid-column: 1 / -1; text-align: center; margin: 1rem 0 2rem 0; width: 100%;">
-            <button onclick="filterByCategoryDirect('${catName.replace(/'/g, "\\'")}')" class="btn btn-outline" style="width: 100%; max-width: 320px; font-weight: 700; padding: 0.6rem var(--spacing-sm); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; border-color: var(--primary); color: var(--primary);">
-              View All ${productsInCat.length} ${catName} →
-            </button>
-          </div>
-        `;
+      // Add "View All" or "Show Less" inline toggle button if category has more than 2 products
+      if (showSummaryView && productsInCat.length > 2) {
+        if (!isExpanded) {
+          html += `
+            <div class="catalog-view-all-wrapper" style="grid-column: 1 / -1; text-align: center; margin: 1rem 0 2rem 0; width: 100%;">
+              <button onclick="expandCategoryInline('${catName.replace(/'/g, "\\'")}')" class="btn btn-outline catalog-view-all-btn" style="width: 100%; max-width: 320px; font-weight: 700; padding: 0.6rem 1.5rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; border: 2px solid var(--primary); color: var(--primary); background-color: transparent; display: inline-flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                View All ${productsInCat.length} ${catName} →
+              </button>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="catalog-view-all-wrapper" style="grid-column: 1 / -1; text-align: center; margin: 1rem 0 2rem 0; width: 100%;">
+              <button onclick="collapseCategoryInline('${catName.replace(/'/g, "\\'")}')" class="btn btn-outline catalog-view-all-btn" style="width: 100%; max-width: 320px; font-weight: 700; padding: 0.6rem 1.5rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; border: 2px solid var(--primary); color: var(--primary); background-color: transparent; display: inline-flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                Show Less ${catName} ←
+              </button>
+            </div>
+          `;
+        }
       }
     }
   });

@@ -388,7 +388,14 @@ document.addEventListener("DOMContentLoaded", async () => {
               html += generateProductCardHTML(p);
             });
             
-
+            // Add redirect to full catalog category page (renders on both mobile and desktop)
+            html += `
+              <div class="homepage-view-all-wrapper" style="grid-column: 1 / -1; text-align: center; margin: 1rem 0 2rem 0; width: 100%;">
+                <button onclick="window.location.href='/products/${makeCategorySlug(catName)}'" class="btn btn-outline homepage-view-all-btn" style="width: 100%; max-width: 320px; font-weight: 700; padding: 0.6rem 1.5rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; border: 2px solid var(--primary); color: var(--primary); background-color: transparent; display: inline-flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                  View All ${catName} →
+                </button>
+              </div>
+            `;
           }
         });
         

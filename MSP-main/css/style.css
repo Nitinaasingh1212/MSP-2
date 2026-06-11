@@ -1113,3 +1113,24 @@ textarea.form-control {
 .toast-success { border-left: 5px solid var(--success); }
 .toast-error { border-left: 5px solid var(--error); }
 .toast-warning { border-left: 5px solid var(--warning); }
+
+/* View All / Category Redirect Button Styles */
+.homepage-view-all-btn,
+.catalog-view-all-btn {
+  background-color: transparent !important;
+  color: var(--primary) !important;
+  border: 2px solid var(--primary) !important;
+  transition: all 0.3s ease !important;
+}
+
+.homepage-view-all-btn:hover,
+.homepage-view-all-btn:focus,
+.homepage-view-all-btn:active,
+.catalog-view-all-btn:hover,
+.catalog-view-all-btn:focus,
+.catalog-view-all-btn:active {
+  background-color: var(--primary) !important;
+  color: var(--white) !important;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2) !important;
+  transform: translateY(-2px) !important;
+}
