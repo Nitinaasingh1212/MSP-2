@@ -276,7 +276,7 @@ function applyFiltersAndRender() {
   const filtered = getFilteredProducts();
   
   // Define core categories to prioritize in display order
-  const CATEGORY_ORDER = ["Capsules", "Injections", "Syrups", "Tablets", "Veterinary"];
+  const CATEGORY_ORDER = ["Tablets", "Capsules", "Syrups", "Injections", "Ayurvedic"];
   
   // Find all unique categories represented in the filtered products list
   const representedCategories = [...new Set(filtered.map(p => p.category))];

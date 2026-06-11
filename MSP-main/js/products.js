@@ -249,6 +249,53 @@ document.addEventListener("DOMContentLoaded", async () => {
   
   // 1. HOME PAGE RENDERING
   if (isIndex) {
+    // Render categories dynamically on homepage
+    const homepageCategories = document.getElementById("homepageCategories");
+    if (homepageCategories) {
+      try {
+        const categories = await fetchCategories();
+        homepageCategories.innerHTML = "";
+        
+        // Prioritized emoji mapping function
+        function getCategoryEmoji(catName) {
+          const name = catName.toLowerCase().trim();
+          if (name.includes("tablet")) return "💊";
+          if (name.includes("capsule")) return "🧪";
+          if (name.includes("syrup")) return "🍷";
+          if (name.includes("injection")) return "💉";
+          if (name.includes("ayurvedic") || name.includes("herbal")) return "🌿";
+          if (name.includes("veterinary") || name.includes("animal")) return "🐾";
+          return "📦"; // Default
+        }
+        
+        // Filter out inactive categories
+        const activeCats = categories.filter(c => c.status === "active" || c.status === true || c.status === "true");
+        
+        // Define sorting order for homepage divisions
+        const HOME_CATEGORY_ORDER = ["Tablets", "Capsules", "Syrups", "Injections", "Ayurvedic"];
+        
+        activeCats.sort((a, b) => {
+          const indexA = HOME_CATEGORY_ORDER.findIndex(cat => cat.toLowerCase() === a.name.toLowerCase());
+          const indexB = HOME_CATEGORY_ORDER.findIndex(cat => cat.toLowerCase() === b.name.toLowerCase());
+          const valA = indexA === -1 ? 999999 : indexA;
+          const valB = indexB === -1 ? 999999 : indexB;
+          return valA - valB;
+        });
+
+        activeCats.forEach(cat => {
+          const emoji = getCategoryEmoji(cat.name);
+          homepageCategories.innerHTML += `
+            <div class="category-card" onclick="window.location.href='/products/${cat.name.toLowerCase()}'">
+              <span class="category-card-icon">${emoji}</span>
+              <div class="category-card-name">${cat.name}</div>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error("Error loading categories dynamically:", err);
+      }
+    }
+
     const featuredContainer = document.getElementById("featuredProductsContainer");
     if (featuredContainer) {
       const featured = await fetchFeaturedProducts();
@@ -257,7 +304,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } else {
         featuredContainer.innerHTML = "";
         
-        const CATEGORY_ORDER = ["Capsules", "Injections", "Syrups", "Tablets", "Veterinary"];
+        const CATEGORY_ORDER = ["Tablets", "Capsules", "Syrups", "Injections", "Ayurvedic"];
         
         // Find represented categories in featured products
         const representedCategories = [...new Set(featured.map(p => p.category))];
