@@ -46,7 +46,7 @@ function saveCart(cart) {
 }
 
 // Add item to cart
-function addToCart(productId, name, category, quantity = 10, imageUrl = "") {
+function addToCart(productId, name, category, quantity = 1, imageUrl = "") {
   const cart = getCart();
   const index = cart.findIndex(item => item.productId === productId);
   
@@ -153,9 +153,9 @@ function renderCartPage() {
         </div>
         <div class="cart-item-controls">
           <div class="cart-item-qty-selector">
-            <button onclick="changeCartQty('${item.productId}', -10)">-</button>
+            <button onclick="changeCartQty('${item.productId}', -1)">-</button>
             <input type="number" value="${item.quantity}" min="1" onchange="updateCartQuantity('${item.productId}', this.value)">
-            <button onclick="changeCartQty('${item.productId}', 10)">+</button>
+            <button onclick="changeCartQty('${item.productId}', 1)">+</button>
           </div>
           <button onclick="removeFromCart('${item.productId}')" class="cart-item-remove-btn" title="Remove Product">
             <i data-lucide="trash-2"></i>

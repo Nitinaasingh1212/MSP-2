@@ -601,7 +601,7 @@ function generateProductCardHTML(p) {
 
 // Add to Enquiry Cart Helper
 function addToEnquiryCartDirect(id, name, category, imageUrl = "") {
-  addToCart(id, name, category, 10, imageUrl); // default qty is 10 packs
+  addToCart(id, name, category, 1, imageUrl); // default qty is 1 pack
   showToastNotification(`Added ${name} to Cart`, "check-circle", "toast-success");
 }
 
@@ -610,7 +610,7 @@ function addProductToEnquiryCart() {
   const id = window.currentProductId || params.get("id");
   const name = document.getElementById("detailName").innerText;
   const category = document.getElementById("detailCategory").innerText;
-  const qty = parseInt(document.getElementById("detailQty").value) || 10;
+  const qty = parseInt(document.getElementById("detailQty").value) || 1;
   
   if (!id) {
     showToastNotification("Could not identify product.", "alert-triangle", "toast-error");
@@ -625,7 +625,7 @@ function addProductToEnquiryCart() {
 // Direct Enquiry trigger
 function sendDirectWhatsappEnquiry() {
   const name = document.getElementById("detailName").innerText;
-  const qty = document.getElementById("detailQty").value || 10;
+  const qty = document.getElementById("detailQty").value || 1;
   
   const msg = `Hello Maa Sukriti Pharmaceuticals,\n\nI am interested in the following product:\n1. ${name} - ${qty} Packs\n\nPlease share availability and quote details.`;
   const encoded = encodeURIComponent(msg);

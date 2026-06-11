@@ -147,7 +147,7 @@
             <span style="font-weight: 700; color: var(--dark); font-size: 0.95rem;">Enquiry Quantity</span>
             <div style="display: flex; align-items: center; border: 2px solid var(--gray-light); border-radius: var(--radius-sm); overflow: hidden; background-color: var(--light);">
               <button onclick="changeQty(-1)" style="border: none; background: none; width: 36px; height: 36px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); font-size: 1.2rem;">-</button>
-              <input type="number" id="detailQty" value="10" min="1" style="border: none; width: 60px; text-align: center; font-weight: 700; font-family: var(--font); background: none; outline: none; font-size: 0.95rem;">
+              <input type="number" id="detailQty" value="1" min="1" style="border: none; width: 60px; text-align: center; font-weight: 700; font-family: var(--font); background: none; outline: none; font-size: 0.95rem;">
               <button onclick="changeQty(1)" style="border: none; background: none; width: 36px; height: 36px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); font-size: 1.2rem;">+</button>
             </div>
           </div>
@@ -445,7 +445,7 @@
     function changeQty(amount) {
       const qtyInput = document.getElementById('detailQty');
       let currentVal = parseInt(qtyInput.value);
-      if (isNaN(currentVal)) currentVal = 10;
+      if (isNaN(currentVal)) currentVal = 1;
       let newVal = currentVal + amount;
       if (newVal < 1) newVal = 1;
       qtyInput.value = newVal;
