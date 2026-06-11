@@ -8,6 +8,15 @@ const productsPerPage = 9;
 
 let allCatalogProducts = [];
 
+// Helper to generate a clean URL-friendly category slug
+function makeCategorySlug(name) {
+  if (!name) return "";
+  return name.toLowerCase()
+             .trim()
+             .replace(/[^a-z0-9]+/g, '-')
+             .replace(/^-+|-+$/g, '');
+}
+
 // Helper to update page titles, meta tags, and breadcrumbs for category pages
 function updateSEOHeaders(categoryName) {
   if (categoryName === "All Categories" || categoryName === "all") {
@@ -99,7 +108,7 @@ async function initCatalog() {
           window.history.pushState({}, "", "/products");
           updateSEOHeaders("All Categories");
         } else {
-          window.history.pushState({}, "", `/products/${activeCategory.toLowerCase()}`);
+          window.history.pushState({}, "", `/products/${makeCategorySlug(activeCategory)}`);
           updateSEOHeaders(activeCategory);
         }
         applyFiltersAndRender();
@@ -112,7 +121,7 @@ async function initCatalog() {
   let urlCategory = null;
   if (path.includes('/products/')) {
     const catSlug = path.split('/products/').pop().split('/').shift().toLowerCase();
-    const foundCat = categories.find(c => c.name.toLowerCase() === catSlug);
+    const foundCat = categories.find(c => makeCategorySlug(c.name) === catSlug || c.name.toLowerCase() === catSlug);
     if (foundCat) {
       urlCategory = foundCat.name;
     } else {
@@ -248,7 +257,7 @@ window.filterByCategoryDirect = function(catName) {
   });
   
   // Update URL path for clean category routing
-  window.history.pushState({}, "", `/products/${catName.toLowerCase()}`);
+  window.history.pushState({}, "", `/products/${makeCategorySlug(catName)}`);
   updateSEOHeaders(catName);
   
   // Re-render list

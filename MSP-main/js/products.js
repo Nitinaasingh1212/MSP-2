@@ -24,6 +24,15 @@ function isValidImageUrl(url) {
          pathname.endsWith('.bmp');
 }
 
+// Helper to generate a clean URL-friendly category slug
+function makeCategorySlug(name) {
+  if (!name) return "";
+  return name.toLowerCase()
+             .trim()
+             .replace(/[^a-z0-9]+/g, '-')
+             .replace(/^-+|-+$/g, '');
+}
+
 // Default Mock Data for local fallback (Demo Mode)
 const DEFAULT_MOCK_CATEGORIES = [
   { id: "cat_1", name: "Tablets", status: "active" },
@@ -307,7 +316,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         catsToDisplay.forEach(cat => {
           const emoji = getCategoryEmoji(cat.name);
           homepageCategories.innerHTML += `
-            <div class="category-card" onclick="window.location.href='/products/${cat.name.toLowerCase()}'">
+            <div class="category-card" onclick="window.location.href='/products/${makeCategorySlug(cat.name)}'">
               <span class="category-card-icon">${emoji}</span>
               <div class="category-card-name">${cat.name}</div>
             </div>
@@ -382,7 +391,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Add redirect to full catalog category page (renders on both mobile and desktop)
             html += `
               <div style="grid-column: 1 / -1; text-align: center; margin: 1rem 0 2rem 0; width: 100%;">
-                <button onclick="window.location.href='/products/${catName.toLowerCase()}'" class="btn btn-outline" style="width: 100%; max-width: 320px; font-weight: 700; padding: 0.6rem var(--spacing-sm); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; border-color: var(--primary); color: var(--primary);">
+                <button onclick="window.location.href='/products/${makeCategorySlug(catName)}'" class="btn btn-outline" style="width: 100%; max-width: 320px; font-weight: 700; padding: 0.6rem var(--spacing-sm); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; border-color: var(--primary); color: var(--primary);">
                   View All ${catName} →
                 </button>
               </div>
