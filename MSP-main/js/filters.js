@@ -224,7 +224,42 @@ async function initCatalog() {
     });
   }
   
-  // 7. Initial render
+  // 7. Setup Popstate listener for browser back/forward navigation
+  window.addEventListener("popstate", () => {
+    const currentPath = window.location.pathname;
+    let urlCategory = null;
+    if (currentPath.includes('/products/')) {
+      const catSlug = currentPath.split('/products/').pop().split('/').shift().toLowerCase();
+      const foundCat = categories.find(c => makeCategorySlug(c.name) === catSlug || c.name.toLowerCase() === catSlug);
+      if (foundCat) {
+        urlCategory = foundCat.name;
+      } else {
+        urlCategory = catSlug.charAt(0).toUpperCase() + catSlug.slice(1);
+      }
+    }
+    
+    if (urlCategory) {
+      activeCategory = urlCategory;
+      updateSEOHeaders(urlCategory);
+    } else {
+      activeCategory = "all";
+      updateSEOHeaders("All Categories");
+    }
+    
+    // Mark appropriate category filter button active
+    document.querySelectorAll(".btn-category-filter").forEach(btn => {
+      if (btn.getAttribute("data-category").toLowerCase() === activeCategory.toLowerCase()) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    });
+    
+    expandedCategories.clear();
+    applyFiltersAndRender();
+  });
+
+  // 8. Initial render
   applyFiltersAndRender();
 }
 
